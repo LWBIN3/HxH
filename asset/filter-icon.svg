@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <!-- 單一外圈 -->
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#4169e1" stroke-width="2"/>
+        
+        <!-- MoS2 結構 -->
+        <g transform="translate(50,50) scale(0.7)">
+            <!-- 連接線 -->
+            <g stroke="#4169e1" stroke-width="1" opacity="0.6">
+                <line x1="-30" y1="0" x2="30" y2="0"/>
+                <line x1="-15" y1="-26" x2="15" y2="26"/>
+                <line x1="-15" y1="26" x2="15" y2="-26"/>
+            </g>
+
+            <!-- Mo 原子 (中心較大) -->
+            <g>
+                <circle cx="0" cy="0" r="6" fill="#4169e1"/>
+                <circle cx="-30" cy="0" r="6" fill="#4169e1"/>
+                <circle cx="30" cy="0" r="6" fill="#4169e1"/>
+            </g>
+
+            <!-- S 原子 (外圍較小) -->
+            <g>
+                <circle cx="-15" cy="-26" r="4" fill="#5177e5" opacity="0.8"/>
+                <circle cx="15" cy="-26" r="4" fill="#5177e5" opacity="0.8"/>
+                <circle cx="-15" cy="26" r="4" fill="#5177e5" opacity="0.8"/>
+                <circle cx="15" cy="26" r="4" fill="#5177e5" opacity="0.8"/>
+            </g>
+        </g>
+    </svg>

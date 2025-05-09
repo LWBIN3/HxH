@@ -1,0 +1,432 @@
+@import url('https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Giga:wght@100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+body {
+    background: #1A1C21;
+    min-height: 100vh;
+    overflow-x: hidden;/* 防止水平滾動 */
+}
+
+/* 自訂滾動條樣式 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1C21;
+}
+::-webkit-scrollbar-thumb {
+    background: #76809e;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+}
+/* 導航欄的設置 */
+nav {
+    position: fixed;
+    height: 5px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(145deg, #4169e1, #5177e5);
+
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(65, 105, 225, 0.2);
+    font-family: "Ubuntu", serif;
+    z-index: 2; /* 確保nav保持在上 */
+}
+
+nav .nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;/*我讓Qorillaz和其他導航鍵以空格分開 */
+    height: 100%;
+    max-width: 80%;
+    margin: auto;/*外邊框的設置，我這邊用來置中*/
+}
+
+.nav-content .logo a {
+    position: relative;
+    right: 8vw;
+    font-size: 30px;
+    font-weight: 500;
+    color: #f5f7fb;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.nav-content .nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-content .nav-links li {
+    list-style: none;/*把前面的裝飾拿掉，也就是圓圈圈*/
+    margin: 0 8px;
+
+}
+
+.nav-links li a {
+    font-size: 26px;
+    font-weight: 500;
+    color: #dbd7d7;
+    padding: 10px 4px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.home {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 80vh;
+    width: 100%;
+    background: #1A1C21;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    z-index: 1;
+    padding-top: 10%; /* 和nav保持距離 */
+}
+
+.logo-img {
+    max-width: 700px;
+    height: auto;
+    margin-top: 1%;
+}
+
+.search-container {
+    margin-top: 1%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: transparent;
+}
+
+.search-form {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    gap: 10px;
+    background: #2F333A;/* 深灰色背景 */
+    padding: 10px 20px;
+    border-radius: 28px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    background: transparent; /* 透明背景 */
+    border: none;
+    color: #ffffff;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);/* 淡灰色的提示文字 */
+}
+/*篩選功能還有搜尋功能的調整*/
+.search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 30px;
+    background: #2F333A;/* 與搜尋框同色 */
+    color: #4070f4;
+    border: 1px solid #444d5c; /* 統一的邊框顏色 */
+    border-radius: 1000px;
+    font-size: 25px;
+    cursor: pointer;
+    padding: 10px 10px;
+}
+.search-btn  img {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+.search-btn:hover img {
+    transform: scale(1.1);
+}
+
+
+.filteredMaterials {
+    padding: 40px 80px;
+    text-align: justify; 
+    color: #ffffff;
+    /*
+    min-height: 100vh;確保有足夠的內容高度來產生滾動效果 
+    margin-top: 100vh;
+
+    box-shadow: 0 -5px 10px rgba(255, 255, 255, 0.3);頂部的陰影
+    height: calc(100vh - 45px);  視窗高度減去導航欄高度 
+    position: sticky;改成sitcky
+    top: 60px; 導航欄的高度 
+    overflow-y: auto;*/
+    z-index: 1;
+    min-height: auto;
+
+    position: relative;
+    height: auto;
+    overflow-y: visible;
+}
+
+/* 表格樣式 */
+.filteredMaterials table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 20px 0;
+    background: #2F333A;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+}
+
+/* 表頭樣式 */
+.filteredMaterials thead {
+    background: linear-gradient(145deg, #4169e1, #5177e5);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.filteredMaterials th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 14px;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 表格內容樣式 */
+.filteredMaterials td {
+    padding: 12px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+}
+
+.filteredMaterials tbody tr:hover {
+    background: rgba(65, 105, 225, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* 分頁控制區域樣式 */
+.pagectrl {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background: #2F333A;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+/* 下拉選單樣式 */
+.pagectrl select {
+    padding: 8px 12px;
+    border: 1px solid rgba(65, 105, 225, 0.3);
+    border-radius: 6px;
+    background: #1A1C21;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.pagectrl select:hover {
+    border-color: #4169e1;
+}
+
+.pagectrl select:focus {
+    border-color: #4169e1;
+    box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.2);
+}
+
+/* 按鈕樣式 */
+.pagectrl button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #4169e1;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pagectrl button:hover {
+    background: #5177e5;
+    transform: translateY(-1px);
+}
+
+.pagectrl button:disabled {
+    background: #2F333A;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 響應式設計 */
+@media screen and (max-width: 1024px) {
+    .filteredMaterials {
+        padding: 10px;
+    }
+    
+    .filteredMaterials table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .pagectrl {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+/* 確保最後一行沒有邊框 */
+.filteredMaterials tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 處理當使用者按下篩選按鈕後的視窗 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.filter-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    z-index: 1001;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.select-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.select-item label {
+    font-weight: 500;
+}
+
+.select-item input[type="search"],
+.select-item select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.range-input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.range-input input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.range-input span {
+    margin: 0 8px;
+}
+
+.range-input select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end ;  
+    gap: 10px;  /* 按鈕之間的間距 */
+    margin-top: 20px;
+}
+
+#clearButton {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#clearButton:hover {
+    background-color: #5a6268;
+}
+
+#goButton {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#goButton:hover {
+    background-color: #0056b3;
+}
+

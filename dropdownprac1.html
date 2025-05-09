@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .dropdown {
+      position: relative;
+      width: 200px;
+    }
+
+    .dropdown-button {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dropdown-button:hover {
+      background: #f5f5f5;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .dropdown-item:hover {
+      background: #f5f5f5;
+    }
+
+    .dropdown-item.selected::after {
+      content: "✓";
+      margin-left: 10px;
+      color: #4CAF50;
+    }
+
+    .submenu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      width: 200px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .has-submenu {
+      position: relative;
+    }
+
+    .has-submenu::after {
+      content: "›";
+      margin-left: 10px;
+    }
+
+    .has-submenu:hover .submenu {
+      display: block;
+    }
+
+    .arrow {
+      border: solid #666;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    .arrow.up {
+      transform: rotate(-135deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="dropdown">
+    <button class="dropdown-button">
+      <span class="button-text">選擇選項</span>
+      <span class="arrow"></span>
+    </button>
+    <div class="dropdown-content">
+      <div class="dropdown-item">選項 1</div>
+      <div class="dropdown-item has-submenu">
+        選項 2
+        <div class="submenu">
+          <div class="dropdown-item">子選項 2-1</div>
+          <div class="dropdown-item">子選項 2-2</div>
+          <div class="dropdown-item">子選項 2-3</div>
+        </div>
+      </div>
+      <div class="dropdown-item has-submenu">
+        選項 3
+        <div class="submenu">
+          <div class="dropdown-item">子選項 3-1</div>
+          <div class="dropdown-item has-submenu">
+            子選項 3-2
+            <div class="submenu">
+              <div class="dropdown-item">子選項 3-2-1</div>
+              <div class="dropdown-item">子選項 3-2-2</div>
+            </div>
+          </div>
+          <div class="dropdown-item">子選項 3-3</div>
+        </div>
+      </div>
+      <div class="dropdown-item">選項 4</div>
+      <div class="dropdown-item">選項 5</div>
+    </div>
+  </div>
+
+  <script>
+    const dropdown = document.querySelector('.dropdown');
+    const buttonText = dropdown.querySelector('.button-text');
+    const items = dropdown.querySelectorAll('.dropdown-item');
+
+    items.forEach(item => {
+      item.addEventListener('click', (e) => {
+        // 只有在點擊的不是子選單容器時才執行
+        if (!e.target.classList.contains('has-submenu')) {
+          // 移除所有項目的selected類
+          items.forEach(i => i.classList.remove('selected'));
+          
+          // 為當前項目添加selected類
+          item.classList.add('selected');
+          
+          // 更新按鈕文字
+          buttonText.textContent = item.textContent.trim();
+          
+          // 阻止事件冒泡
+          e.stopPropagation();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

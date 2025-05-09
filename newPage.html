@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D database</title>
+    <link rel="icon" type="image/png" href="asset/QQfavicon.png">
+    <link rel="stylesheet" href="newPage.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/kd-tree-javascript@1.0.3/kdTree.min.js"></script>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">
+                <a href="/project.html">Qorillaz.DB</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Reference</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">More Info</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 選單 -->
+    <div class="stats-bar">
+        <!-- <div class="stat-item" data-id="overview">Overview</div> -->
+        <div class="stat-item" data-id="crystal">Crystal Structure</div>
+        <div class="stat-item" data-id="stability">Stability</div>
+        <div class="stat-item" data-id="stiffness">Stiffness tensor</div>
+        <div class="stat-item" data-id="electronic">Electronic bands</div>
+        <div class="stat-item" data-id="bader">Bader charges</div>
+        <div class="stat-item" data-id="optical">Optical polarizability</div>
+        <div class="dropdown">
+            <button class="dropdown-button">
+                <span class="button-text">Visualization</span>
+                <span class="arrow"></span>
+            </button>
+            <div class="dropdown-content">
+                <div class="dropdown-item">Hide</div>
+                <div class="dropdown-item has-submenu">
+                    Show
+                    <div class="submenu">
+                        <div class="dropdown-item" id="periodic-select">1*1*1</div>
+                        <div class="dropdown-item" id="periodic-select">2*2*1</div>
+                        <div class="dropdown-item" id="periodic-select">3*3*1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- 介紹區以及視覺化區 -->
+    <div class="content-area">
+        <div class="material-info">
+            <h2>Overview</h2>
+            <p>Properties and characteristics will be displayed here</p>
+        </div>
+        <div class="visualization-area" id="plot">
+
+        </div>
+    </div>
+    <!-- 主要內容區 -->
+    <div class="maincontent">
+        <div class="material-details">
+            <p>Properties and characteristics will be displayed here</p>
+        </div>
+
+    </div>
+
+    <script src="newPage.js"></script>
+</body>
+</html>

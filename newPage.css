@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1A1C21;
+    color: #fff;
+    font-family: 'Ubuntu', sans-serif;
+    padding-top: 40px;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #1A1C21;
+}
+::-webkit-scrollbar-thumb {
+    background: #76809e;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+}
+
+nav {
+    position: fixed;
+    height: 5px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(145deg, #4169e1, #5177e5);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(65, 105, 225, 0.2);
+    font-family: "Ubuntu", serif;
+    z-index: 2;
+}
+
+nav .nav-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 80%;
+    margin: auto;
+}
+
+.nav-content .logo a {
+    position: relative;
+    right: 8vw;
+    font-size: 30px;
+    font-weight: 500;
+    color: #f5f7fb;
+    text-shadow: 1px 1px 2px #000;
+    text-decoration: none;
+}
+
+.nav-content .nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-content .nav-links li {
+    list-style: none;
+    margin: 0 8px;
+}
+
+.nav-links li a {
+    font-size: 26px;
+    font-weight: 500;
+    color: #dbd7d7;
+    padding: 10px 4px;
+    text-shadow: 1px 1px 2px #000;
+    text-decoration: none;
+}
+
+.stats-bar {
+    background: #23252c;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    min-height: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.25rem 1rem;
+    border-radius: 4px;
+    font-size: 1.3rem;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(65, 105, 225, 0.3);
+}
+
+.stat-item.active {
+    background: #4169e1;
+    color: white;
+}
+
+.content-area {
+    display: flex;
+    margin-top: 1rem;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.material-info {
+    flex: 1;
+    padding: 3rem;
+    min-width: 300px;
+    margin-left:2%;
+}
+.material-details {
+    flex: 1;
+    padding: 1rem;
+    min-width: 300px;
+    padding: 3rem;
+    margin-left:2%;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+}
+
+.tab-content.active {
+    display: flex;
+}
+
+.visualization-area {
+    /* flex: 1; */
+    background: #2a2d35;
+    min-height: 450px;
+    margin: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 800px;
+    margin-right: 6rem;
+    overflow: hidden;  /* 防止內容溢出 */
+}
+
+/* 下拉選單相關樣式修改 */
+.dropdown {
+    position: relative;
+    width: 200px;
+}
+
+.dropdown-button {
+    width: 100%;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 1.3rem;  /* 與其他選項統一大小 */
+}
+
+.dropdown-button:hover {
+    background: rgba(65, 105, 225, 0.3);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #2a2d35;  /* 更深的背景色 */
+    border-radius: 4px;
+    margin-top: 4px;
+    z-index: 1000;  /* 確保下拉選單在上層 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 新增：顯示下拉選單的類 */
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background: rgba(65, 105, 225, 0.3);
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 65px;
+    background: #2a2d35;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.has-submenu {
+    position: relative;
+}
+
+.has-submenu::after {
+    content: "›";
+    position: absolute;
+    right: 10px;
+}
+
+.has-submenu:hover .submenu {
+    display: block;
+}
+.arrow {
+border: solid #666;
+border-width: 0 2px 2px 0;
+display: inline-block;
+padding: 3px;
+transform: rotate(45deg);
+transition: transform 0.2s;
+}
+
+.arrow.up {
+transform: rotate(-135deg);
+}
+
+

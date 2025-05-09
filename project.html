@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qorillaz</title>
+    <link rel="icon" type="image/png" href="asset/QQfavicon.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+</head>
+<body>
+    <!-- 導航欄的設置 -->
+    <nav>
+        <div class="nav-content">
+            <div class="logo">
+                <a href="/project.html">Qorillaz.DB</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="https://www.google.com.tw/?hl=zh_TW">Home</a></li>
+                <li><a href="#">Reference</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">More Info</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- 中間搜尋的位置 -->
+    <section class="home">
+        <img src="asset/Qorillaz.DB-removebg-preview.png" class="logo-img">
+        <div class="search-container">
+            <div class="search-form">
+                <input type="text" class="search-input" placeholder="Search Database...">
+                <button type="submit" class="search-btn" id="filter">
+                    <img src="asset/filter.svg" alt="filter">
+                </button>
+                <button type="submit" class="search-btn" id="search">
+                    <img src="asset/search.svg" alt="search">
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- 主頁的下半部份 -->
+    <div class="filteredMaterials">
+        <!-- 放置材料的地方 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Formula</th>
+                    <th>Energy above convex hull [ev/atom]</th>
+                    <th>Heat of formation [ev/atom]</th>
+                    <th>Band gap [ev]</th>
+                    <th>Magnetic</th>
+                    <th>Layer group</th>
+                </tr>
+            </thead>
+            <tbody id="MaterialList" class="MaterialList">
+            </tbody>
+        </table>
+        <!-- 頁數的控制 -->
+        <span class="pagectrl">
+            <select id="itemsPerPage">
+            <option value="15">15 / page</option>
+            <option value="25">25 / page</option>
+            <option value="50">50 / page</option>
+            </select>
+            <select id="gotoPage">
+            </select>
+            <button id="previousPage">Previous</button>
+            <button id="nextPage">Next</button>
+        </span>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
