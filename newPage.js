@@ -999,4 +999,3 @@ function getElementSymbol(atomicNumber) {
   );
   return reverseElementMap[atomicNumber] || "Unknown";
 }
-console.log("we");
