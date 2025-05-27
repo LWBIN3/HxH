@@ -103,11 +103,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   const dropdownButton = dropdown.querySelector(".dropdown-button");
   const dropdownContent = dropdown.querySelector(".dropdown-content");
   const mainDropdownItems = dropdownContent.querySelectorAll(".dropdown-item");
+  const directionPanel = document.querySelector(".direction");
   let currentPeriodicSize = "1x1x1"; // 默認週期性大小
 
   // 點擊按鈕時顯示/隱藏下拉選單
   dropdownButton.addEventListener("click", (e) => {
     dropdownContent.classList.toggle("show");
+
     e.stopPropagation();
   });
 
@@ -115,14 +117,16 @@ document.addEventListener("DOMContentLoaded", async function () {
   mainDropdownItems.forEach((item) => {
     item.addEventListener("click", async function (e) {
       const action = this.textContent.trim();
-
+      directionPanel.classList.add("show");
+      //用toggle的話就是一直切換
       if (action === "Hide") {
         // 隱藏視覺化
-        document.getElementById("plot").innerHTML = "";
+        directionPanel.classList.remove("show");
         dropdownButton.querySelector(".button-text").textContent = "Hide";
       } else if (this.classList.contains("has-submenu")) {
         // 展開子選單，不執行其他操作
         e.stopPropagation();
+
         return;
       }
 
@@ -234,11 +238,11 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
 // 增加方向光，模擬太陽光
-const directionalLight1 = new THREE.DirectionalLight(0xcfcfcf, 0.8);
+const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight1.position.set(1, 1, 1).normalize();
 scene.add(directionalLight1);
 
-const directionalLight2 = new THREE.DirectionalLight(0xcfcfcf, 0.8);
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight2.position.set(-1, -1, -1).normalize();
 scene.add(directionalLight2);
 
@@ -449,15 +453,15 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
   console.log(expandedAtoms);
   expandedAtoms.forEach((atom) => {
     const skinColor = getAtomColor(atom.element);
-    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+    const sphereMaterial = new THREE.MeshPhongMaterial({
       color: skinColor,
-      metalness: 0.1, // 金屬感低，維持非金屬特性
-      roughness: 0.4, // 略光滑但不鏡面
-      clearcoat: 0.8, // 有清漆層產生柔亮高光
-      clearcoatRoughness: 0.1, // 清漆層光滑
-      reflectivity: 0.5, // 半反射
-      transmission: 0.0, // 如果不透明就設為 0
-      thickness: 1.0, // 厚度，若 transmission > 0 才會有效
+      // metalness: 0.1, // 金屬感低，維持非金屬特性
+      // roughness: 0.4, // 略光滑但不鏡面
+      // clearcoat: 0.8, // 有清漆層產生柔亮高光
+      // clearcoatRoughness: 0.1, // 清漆層光滑
+      // reflectivity: 0.5, // 半反射
+      // transmission: 0.0, // 如果不透明就設為 0
+      // thickness: 1.0, // 厚度，若 transmission > 0 才會有效
     });
 
     const modifiedRadius = getAtomRadius(atom.element) * 0.005;
@@ -481,7 +485,7 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
   cameraDirection.addEventListener("click", (e) => {
     if (e.target.tagName === "BUTTON") {
       const buttonId = e.target.id;
-      console.log("按鈕被點擊:", buttonId);
+      console.log(buttonId);
 
       // 解析按鈕ID來確定軸向和方向
       let axis, isReverse;
@@ -510,7 +514,7 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
   boundingBox.getCenter(center);
   boundingBox.getSize(size);
 
-  console.log("計算出的結構中心點:", center.toArray());
+  console.log("center:", center.toArray());
 
   // 根據結構大小計算合適的相機距離
   const maxDim = Math.max(size.x, size.y, size.z);
@@ -557,8 +561,6 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
   // 更新 OrbitControls
   controls.target.copy(center);
   controls.update();
-
-  console.log(`相機設定為沿著 ${axis}${isReverse ? "*" : ""} 軸觀看`);
 }
 
 // 2. 建立 Raycaster + mouse
@@ -903,13 +905,13 @@ function createLatticeBox(cell,nx,ny) {
   //設定材質 (基本邊的)
   const defaultLineMaterial = new THREE.LineBasicMaterial({
     color: 0x00ffff,
-    linewidth: 2,
+    linewidth: 1,
   });
 
   //設定材質 (a,b,c的)
-  const lineMaterialA = new THREE.LineBasicMaterial({color:0xff0000,linewidth:2})
-  const lineMaterialB = new THREE.LineBasicMaterial({color:0x00ff00,linewidth:2})
-  const lineMaterialC = new THREE.LineBasicMaterial({color:0x0000ff,linewidth:2})
+  const lineMaterialA = new THREE.LineBasicMaterial({color:0xff0000,linewidth:1})
+  const lineMaterialB = new THREE.LineBasicMaterial({color:0x00ff00,linewidth:1})
+  const lineMaterialC = new THREE.LineBasicMaterial({color:0x0000ff,linewidth:1})
 
   //定義abc軸
   const baseVectors = [
@@ -997,7 +999,3 @@ function getElementSymbol(atomicNumber) {
   );
   return reverseElementMap[atomicNumber] || "Unknown";
 }
-// 監聽視窗大小改變
-window.addEventListener("resize", function () {
-  Plotly.Plots.resize("plot");
-});
