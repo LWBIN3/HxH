@@ -99,7 +99,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   // 視覺化相關的處理
-
   const dropdown = document.querySelector(".dropdown");
   const dropdownButton = dropdown.querySelector(".dropdown-button");
   const dropdownContent = dropdown.querySelector(".dropdown-content");
@@ -162,6 +161,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
+  //確認一下有沒有確實抓到按鈕的動向
+  const cameraDirection = document.querySelector(".direction");
+  cameraDirection.addEventListener("click", (e) => {
+    if (e.target.tagName === "BUTTON") {
+      console.log(e.target.id);
+    }
+  });
   // 解析材料名稱並獲取原子序號
   const materialList = parseChemicalFormula(materialName);
   const atomicNumbers = materialList.map((element) => elementMap[element]);
@@ -178,6 +184,83 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 });
+
+// 初始化場景、相機和渲染器
+const scene = new THREE.Scene(); // Main scene
+const threeContainer = document.getElementById("plot");
+const containerWidth = threeContainer.clientWidth;
+const containerHeight = threeContainer.clientHeight;
+const aspect = containerWidth / containerHeight; // 計算寬高比
+const viewHeight = 10;
+const viewWidth = viewHeight * aspect;
+const camera = new THREE.OrthographicCamera(
+  -viewWidth / 2, // left
+  viewWidth / 2, // right
+  viewHeight / 2, // top
+  -viewHeight / 2, // bottom
+  0.1, // near (近裁面)
+  1000 // far (遠裁面)
+);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.physicallyCorrectLights = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+// 設置渲染器大小為容器大小而非窗口大小
+renderer.setSize(containerWidth, containerHeight);
+renderer.setClearColor(0x2a2d35);
+
+// 將渲染器的 DOM 元素添加到指定的容器
+threeContainer.appendChild(renderer.domElement);
+
+// 根據容器大小設定渲染器和相機
+const updateRendererSize = () => {
+  const width = threeContainer.clientWidth;
+  const height = threeContainer.clientHeight;
+  renderer.setSize(width, height);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+};
+
+// 第一次設定大小
+updateRendererSize();
+
+// 添加光源
+
+// 增加環境光
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+// 增加方向光，模擬太陽光
+const directionalLight1 = new THREE.DirectionalLight(0xcfcfcf, 0.8);
+directionalLight1.position.set(1, 1, 1).normalize();
+scene.add(directionalLight1);
+
+const directionalLight2 = new THREE.DirectionalLight(0xcfcfcf, 0.8);
+directionalLight2.position.set(-1, -1, -1).normalize();
+scene.add(directionalLight2);
+
+// const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.8);
+// directionalLight3.position.set(-1, -1, 1).normalize();
+// scene.add(directionalLight3);
+
+// 添加點光源，增強特定區域照明
+const pointLight = new THREE.PointLight(0xffffff, 0.5);
+pointLight.position.set(5, 5, 5);
+scene.add(pointLight);
+
+// 使用 OrbitControls
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.update(); // 初始化控制項
+controls.enableDamping = true; //阻尼的感覺
+controls.dampingFacttor = 0.05; //係數調一下
+controls.rotateSpeed = 0.3;
+
+// 創建分子模型組 (所有原子和鍵結都放在這個組裡面)
+const moleculeGroup = new THREE.Group();
+scene.add(moleculeGroup); // 將組添加到主場景中
 
 // 開始處理材料視覺化
 async function initCheck(materialName, atomicNumbers) {
@@ -208,8 +291,8 @@ async function initCheck(materialName, atomicNumbers) {
 
     return matchedData; // 返回數據而不是直接初始化
   } catch (error) {
-    console.error("數據獲取錯誤:", error);
-    document.getElementById("plot").innerHTML = "數據加載失敗";
+    console.error("failed to load:", error);
+    document.getElementById("plot").innerHTML = "failed to load";
     return null;
   }
 }
@@ -339,6 +422,203 @@ const elementMap = {
   Re: 75, Os: 76, Ir: 77, Pt: 78, Au: 79, Hg: 80
 };
 
+function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
+  while (moleculeGroup.children.length > 0) {
+    const child = moleculeGroup.children[0];
+    moleculeGroup.remove(child);
+    if (child.geometry) child.geometry.dispose();
+    if (child.material) child.geometry.dispose();
+  }
+  // 處理週期性展開
+  const [nx, ny] = periodicSize.split("x").map(Number);
+  const expandedAtoms = [];
+
+  // 展開原子
+  for (let i = 0; i < nx; i++) {
+    for (let j = 0; j < ny; j++) {
+      atoms.forEach((atom) => {
+        expandedAtoms.push({
+          x: atom.x + i * cell[0][0] + j * cell[1][0],
+          y: atom.y + i * cell[0][1] + j * cell[1][1],
+          z: atom.z + i * cell[0][2] + j * cell[1][2],
+          element: atom.element,
+        });
+      });
+    }
+  }
+  console.log(expandedAtoms);
+  expandedAtoms.forEach((atom) => {
+    const skinColor = getAtomColor(atom.element);
+    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+      color: skinColor,
+      metalness: 0.1, // 金屬感低，維持非金屬特性
+      roughness: 0.4, // 略光滑但不鏡面
+      clearcoat: 0.8, // 有清漆層產生柔亮高光
+      clearcoatRoughness: 0.1, // 清漆層光滑
+      reflectivity: 0.5, // 半反射
+      transmission: 0.0, // 如果不透明就設為 0
+      thickness: 1.0, // 厚度，若 transmission > 0 才會有效
+    });
+
+    const modifiedRadius = getAtomRadius(atom.element) * 0.005;
+    const sphereGeometry = new THREE.SphereGeometry(modifiedRadius, 64, 64);
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    sphere.userData.element = atom.element;
+    sphere.position.set(atom.x, atom.y, atom.z);
+    moleculeGroup.add(sphere);
+  });
+  //呼叫getBondTypes把鍵結算出來
+  const bondInfo = getBondTypes(expandedAtoms);
+  const expandedBonds = bondInfo.bonds;
+  console.log(bondInfo);
+
+  //呼叫createBonds把鍵結做出來
+  createBonds(expandedAtoms, cell, bondInfo);
+  //呼叫createLatticebox把晶格框架做出來
+  createLatticeBox(cell, nx, ny);
+  // 按鈕事件監聽器，處理相機視角
+  const cameraDirection = document.querySelector(".direction");
+  cameraDirection.addEventListener("click", (e) => {
+    if (e.target.tagName === "BUTTON") {
+      const buttonId = e.target.id;
+      console.log("按鈕被點擊:", buttonId);
+
+      // 解析按鈕ID來確定軸向和方向
+      let axis, isReverse;
+
+      if (buttonId.endsWith("*")) {
+        // 處理 a*, b*, c* 按鈕
+        axis = buttonId.charAt(0); // 取得第一個字符 (a, b, 或 c)
+        isReverse = true;
+      } else {
+        // 處理 a, b, c 按鈕
+        axis = buttonId;
+        isReverse = false;
+      }
+      // 呼叫相機調整函數
+      setCameraViewAlongAxis(axis, isReverse);
+    }
+  });
+}
+
+// 封裝相機調整函數
+function setCameraViewAlongAxis(axis, isReverse = false) {
+  const boundingBox = new THREE.Box3().setFromObject(moleculeGroup);
+  const center = new THREE.Vector3();
+  const size = new THREE.Vector3();
+
+  boundingBox.getCenter(center);
+  boundingBox.getSize(size);
+
+  console.log("計算出的結構中心點:", center.toArray());
+
+  // 根據結構大小計算合適的相機距離
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const cameraDistance = maxDim * 10; // 可以調整這個倍數
+
+  // 定義各軸向的相機位置偏移
+  let offsetFromCenter;
+
+  switch (axis) {
+    case "a":
+      // 沿著 X 軸觀看 (從右側或左側看)
+      offsetFromCenter = new THREE.Vector3(
+        isReverse ? -cameraDistance : cameraDistance,
+        0,
+        0
+      );
+      break;
+    case "b":
+      // 沿著 Y 軸觀看 (從上方或下方看)
+      offsetFromCenter = new THREE.Vector3(
+        0,
+        isReverse ? -cameraDistance : cameraDistance,
+        0
+      );
+      break;
+    case "c":
+      // 沿著 Z 軸觀看 (從前方或後方看)
+      offsetFromCenter = new THREE.Vector3(
+        0,
+        0,
+        isReverse ? -cameraDistance : cameraDistance
+      );
+      break;
+    default:
+      console.warn("未知的軸向:", axis);
+      return;
+  }
+
+  // 設定相機位置和目標
+  camera.position.copy(center).add(offsetFromCenter);
+  camera.lookAt(center);
+  camera.updateProjectionMatrix();
+
+  // 更新 OrbitControls
+  controls.target.copy(center);
+  controls.update();
+
+  console.log(`相機設定為沿著 ${axis}${isReverse ? "*" : ""} 軸觀看`);
+}
+
+// 2. 建立 Raycaster + mouse
+const raycaster = new THREE.Raycaster();
+raycaster.params.Mesh.threshold = 0;
+raycaster.params.Line.threshold = 0.05; //縮小線段的使用範圍，避免一直被他擋住
+const mouse = new THREE.Vector2();
+
+// 3. 建立 tooltip DOM 元素
+const tooltip = document.createElement("div");
+tooltip.style.position = "absolute";
+tooltip.style.padding = "4px 8px";
+tooltip.style.background = "rgba(0,0,0,0.7)";
+tooltip.style.color = "white";
+tooltip.style.borderRadius = "4px";
+tooltip.style.pointerEvents = "none";
+tooltip.style.display = "none";
+document.body.appendChild(tooltip);
+
+// 4. 監聽滑鼠事件
+// 修正滑鼠事件監聽器
+window.addEventListener("mousemove", (event) => {
+  // 獲取容器的邊界框
+  const rect = threeContainer.getBoundingClientRect();
+
+  // 計算相對於容器的滑鼠位置
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  // 直接檢查與moleculeGroup子物體的交集
+  const intersects = raycaster.intersectObjects(moleculeGroup.children);
+
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    if (obj.userData.element) {
+      tooltip.textContent = obj.userData.element;
+      tooltip.style.left = event.clientX + 10 + "px";
+      tooltip.style.top = event.clientY + 10 + "px";
+      tooltip.style.display = "block";
+      // obj.material.color.set(0xff0000);
+    }
+  } else {
+    tooltip.style.display = "none";
+  }
+});
+
+// 建立渲染迴圈
+function animate() {
+  requestAnimationFrame(animate); // 要求瀏覽器在下一個動畫影格呼叫 animate 函數
+
+  controls.update(); // 如果使用了 controls (如 OrbitControls)，需要更新它
+
+  renderer.render(scene, camera); // 呼叫渲染器來繪製場景和相機所見到的畫面
+}
+
+// 啟動渲染迴圈
+animate();
+
 function getBondTypes(atoms) {
   const points = atoms.map((atom) => [atom.x, atom.y, atom.z]);
   const pointToAtom = new Map();
@@ -439,234 +719,155 @@ function getBondTypes(atoms) {
       }
     });
   });
-  // console.log(bonds);
   // console.log(`${bonds.length} bonds were detected`);
 
   // 修改返回對象，包含 minimumDistances
   return { bonds, bondTypes: ["bond"], minimumDistances };
 }
 
-function createBonds(atoms, cell, bondInfo) {
+function createBonds(expandedAtoms, cell, bondInfo) {
+  // 鍵結的粗細 (半徑)
+  const bondRadius = 0.1; // 調整為更合適的尺寸
   const { bonds } = bondInfo;
-  const traces = [];
 
+  // 檢查 bonds 是否存在且為數組
+  if (!bonds || !Array.isArray(bonds) || bonds.length === 0) {
+    console.warn("沒有鍵結可繪製或鍵結數據格式錯誤");
+    return;
+  }
+
+  // 遍歷需要繪製的鍵結列表
   bonds.forEach((bond) => {
-    // 計算總距離
-    const totalDistance = bond.distance;
-
-    // 獲取原子半徑
-    const r1 = getAtomRadius(bond.from.element) * 0.006;
-    const r2 = getAtomRadius(bond.to.element) * 0.006;
-
-    // 計算兩原子中心之間的向量
-    const dx = bond.to.x - bond.from.x;
-    const dy = bond.to.y - bond.from.y;
-    const dz = bond.to.z - bond.from.z;
-
-    // 計算調整後的中點位置（從第一個原子表面開始）
-    const t = r1 / totalDistance; // 第一個原子表面的比例位置
-
-    // 從第一個原子表面開始的點
-    const surfaceStartX = bond.from.x + dx * t;
-    const surfaceStartY = bond.from.y + dy * t;
-    const surfaceStartZ = bond.from.z + dz * t;
-
-    // 第二個原子表面開始的點
-    const surfaceEndX = bond.to.x - dx * (r2 / totalDistance);
-    const surfaceEndY = bond.to.y - dy * (r2 / totalDistance);
-    const surfaceEndZ = bond.to.z - dz * (r2 / totalDistance);
-
-    // 計算鍵結的中點
-    const midX = (surfaceStartX + surfaceEndX) / 2;
-    const midY = (surfaceStartY + surfaceEndY) / 2;
-    const midZ = (surfaceStartZ + surfaceEndZ) / 2;
-
-    // 計算鍵結的半徑
-    const bondRadius = 0.12;
-
-    // 為第一個原子創建半圓柱體（從原子表面到中點）
-    const cylinder1 = generateCylinderPoints(
-      surfaceStartX,
-      surfaceStartY,
-      surfaceStartZ,
-      midX,
-      midY,
-      midZ,
-      bondRadius
-    );
-
-    cylinder1.color = getAtomColor(bond.from.element);
-    cylinder1.hoverinfo = "text";
-    cylinder1.text = `${bond.from.element}-${
-      bond.to.element
-    }: ${bond.distance.toFixed(3)} Å`;
-    cylinder1.name = `${bond.from.element}-${bond.to.element}`;
-    cylinder1.opacity = 1;
-
-    traces.push(cylinder1);
-
-    // 為第二個原子創建半圓柱體（從中點到原子表面）
-    const cylinder2 = generateCylinderPoints(
-      midX,
-      midY,
-      midZ,
-      surfaceEndX,
-      surfaceEndY,
-      surfaceEndZ,
-      bondRadius
-    );
-
-    cylinder2.color = getAtomColor(bond.to.element);
-    cylinder2.hoverinfo = "text";
-    cylinder2.text = `${bond.from.element}-${
-      bond.to.element
-    }: ${bond.distance.toFixed(3)} Å`;
-    cylinder2.name = `${bond.from.element}-${bond.to.element}`;
-    cylinder2.opacity = 1;
-
-    traces.push(cylinder2);
-  });
-
-  return traces;
-}
-
-function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
-  // 處理週期性展開
-  console.time("xtime");
-  const [nx, ny] = periodicSize.split("x").map(Number);
-  const expandedAtoms = [];
-
-  // 展開原子
-  for (let i = 0; i < nx; i++) {
-    for (let j = 0; j < ny; j++) {
-      atoms.forEach((atom) => {
-        expandedAtoms.push({
-          x: atom.x + i * cell[0][0] + j * cell[1][0],
-          y: atom.y + i * cell[0][1] + j * cell[1][1],
-          z: atom.z + i * cell[0][2] + j * cell[1][2],
-          element: atom.element,
-        });
-      });
+    // 確保 bond 對象及其屬性存在
+    if (!bond || !bond.from || !bond.to) {
+      console.warn("require necessary bonding properties", bond);
+      return;
     }
-  }
-  // 直接在展開後的原子上計算鍵結
-  const bondInfo = getBondTypes(expandedAtoms);
-  const expandedBonds = bondInfo.bonds;
 
-  // 準備視覺化數據
-  let data = [];
+    // 從鍵結物件中取出 from 和 to 的位置信息
+    const atom1Pos = new THREE.Vector3(bond.from.x, bond.from.y, bond.from.z);
+    const atom2Pos = new THREE.Vector3(bond.to.x, bond.to.y, bond.to.z);
 
-  // 添加所有原子
-  expandedAtoms.forEach((atom) => {
-    const radius = getAtomRadius(atom.element) * 0.006;
-    const points = generateSpherePoints(atom.x, atom.y, atom.z, radius);
-    data.push({
-      type: "mesh3d",
-      x: points.x,
-      y: points.y,
-      z: points.z,
-      alphahull: 0,
-      color: getAtomColor(atom.element),
-      opacity: 1,
-      name: atom.element,
-      hoverinfo: "text",
-      text: `${atom.element} (${atom.x.toFixed(2)}, ${atom.y.toFixed(
-        2
-      )}, ${atom.z.toFixed(2)})`,
-      lighting: {
-        ambient: 0.6,
-        diffuse: 0.9,
-        specular: 0.4,
-        roughness: 0.7,
-        fresnel: 0.2,
-      },
+    // 計算兩個原子中心之間的總距離
+    const totalDistance = atom1Pos.distanceTo(atom2Pos);
+
+    // 如果距離過小，不繪製
+    if (totalDistance < 0.01) {
+      console.log("Atoms too close", totalDistance);
+      return;
+    }
+
+    // 獲取兩端原子的實際繪製半徑
+    const radiusA = getAtomRadius(bond.from.element) * 0.005; // 與創建原子球體時使用相同的縮放
+    const radiusB = getAtomRadius(bond.to.element) * 0.005;
+
+    // 計算從 atom1Pos 到 atom2Pos 的方向向量
+    const direction = new THREE.Vector3()
+      .subVectors(atom2Pos, atom1Pos)
+      .normalize();
+
+    // 計算原子表面上的點
+    const surfacePointA = new THREE.Vector3()
+      .copy(atom1Pos)
+      .addScaledVector(direction, radiusA);
+    const surfacePointB = new THREE.Vector3()
+      .copy(atom2Pos)
+      .addScaledVector(direction.clone().negate(), radiusB);
+
+    // 計算表面點之間的距離
+    const surfaceDistance = surfacePointA.distanceTo(surfacePointB);
+
+    // 如果表面點之間的距離太小，不繪製
+    if (surfaceDistance < 0.001) {
+      console.log("原子表面太近，跳過繪製鍵結:", surfaceDistance);
+      return;
+    }
+
+    // 計算表面點之間的中點
+    const midPoint = new THREE.Vector3()
+      .addVectors(surfacePointA, surfacePointB)
+      .multiplyScalar(0.5);
+
+    // 獲取兩端原子的顏色
+    const colorA = getAtomColor(bond.from.element);
+    const colorB = getAtomColor(bond.to.element);
+
+    // 計算每一段鍵結的長度(從表面到中點)
+    const halfLength = surfaceDistance / 2;
+    const atom1ToMidpoint = atom1Pos.distanceTo(midPoint);
+    const atom2ToMidpoint = atom2Pos.distanceTo(midPoint);
+    // 創建兩個圓柱體的幾何體
+    const cylinderGeometry1 = new THREE.CylinderGeometry(
+      bondRadius,
+      bondRadius,
+      atom1ToMidpoint,
+      32, // 增加分段數使圓柱體更光滑
+      3
+    );
+
+    const cylinderGeometry2 = new THREE.CylinderGeometry(
+      bondRadius,
+      bondRadius,
+      atom2ToMidpoint,
+      32, // 增加分段數使圓柱體更光滑
+      3
+    );
+
+    // 創建兩個不同顏色的材質
+    const materialA = new THREE.MeshPhysicalMaterial({
+      color: colorA,
+      metalness: 0.1,
+      roughness: 0.4,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2,
     });
+    const materialB = new THREE.MeshPhysicalMaterial({
+      color: colorB,
+      metalness: 0.1,
+      roughness: 0.4,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2,
+    });
+
+    // 創建第一段圓柱體(從atom1表面到中點)
+    const cylinder1 = new THREE.Mesh(cylinderGeometry1, materialA);
+    // 移動使底部對齊atom1表面，頂部對齊中點
+    cylinder1.position.copy(
+      new THREE.Vector3().addVectors(atom1Pos, midPoint).multiplyScalar(0.5)
+    );
+    // 旋轉圓柱體使其對齊鍵結方向
+    cylinder1.lookAt(atom2Pos);
+    cylinder1.rotateX(Math.PI / 2); // 旋轉90度使圓柱體軸對齊方向
+
+    // 創建第二段圓柱體(從中點到atom2表面)
+    const cylinder2 = new THREE.Mesh(cylinderGeometry2, materialB);
+    // 移動使底部對齊中點，頂部對齊atom2表面
+    cylinder2.position.copy(
+      new THREE.Vector3().addVectors(midPoint, atom2Pos).multiplyScalar(0.5)
+    );
+    // 旋轉圓柱體使其對齊鍵結方向
+    cylinder2.lookAt(atom2Pos);
+    cylinder2.rotateX(Math.PI / 2); // 旋轉90度使圓柱體軸對齊方向
+
+    // 將兩個圓柱體添加到分子組
+    moleculeGroup.add(cylinder1);
+    moleculeGroup.add(cylinder2);
+
+    // 可以添加調試用的點來顯示表面點和中點
+    /*
+    const pointGeometry = new THREE.SphereGeometry(bondRadius * 1.5, 8, 8);
+    const pointMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const surfacePoint1 = new THREE.Mesh(pointGeometry, pointMaterial);
+    surfacePoint1.position.copy(surfacePointA);
+    const surfacePoint2 = new THREE.Mesh(pointGeometry, pointMaterial);
+    surfacePoint2.position.copy(surfacePointB);
+    const midPointMesh = new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0x00ffff }));
+    midPointMesh.position.copy(midPoint);
+    moleculeGroup.add(surfacePoint1);
+    moleculeGroup.add(surfacePoint2);
+    moleculeGroup.add(midPointMesh);
+    */
   });
-
-  // 添加鍵結
-  const bondTraces = createBonds(expandedAtoms, cell, bondInfo);
-  data.push(...bondTraces);
-
-  // 創建擴展的晶格框
-  const expandedCell = [
-    [cell[0][0] * nx, cell[0][1], cell[0][2]],
-    [cell[1][0], cell[1][1] * ny, cell[1][2]],
-    [cell[2][0], cell[2][1], cell[2][2]],
-  ];
-  const latticeTraces = createLatticeBox(expandedCell);
-  data.push(...latticeTraces);
-
-  // 設置布局
-  const layout = {
-    scene: {
-      xaxis: {
-        title: "X",
-        showspikes: false,
-        showgrid: false,
-        zeroline: false,
-        visible: false,
-      },
-      yaxis: {
-        title: "Y",
-        showspikes: false,
-        showgrid: false,
-        zeroline: false,
-        visible: false,
-      },
-      zaxis: {
-        title: "Z",
-        showspikes: false,
-        showgrid: false,
-        zeroline: false,
-        visible: false,
-      },
-      aspectmode: "data",
-      camera: {
-        eye: { x: 1.5, y: 1.5, z: 1.5 },
-        projection: { type: "orthographic" },
-      },
-      bgcolor: "#2a2d35",
-    },
-    margin: { l: 0, r: 0, b: 0, t: 0 },
-    showlegend: false,
-    width: 800,
-    height: 450,
-    paper_bgcolor: "#2a2d35",
-    plot_bgcolor: "#2a2d35",
-  };
-
-  // 繪製視覺化
-  Plotly.newPlot("plot", data, layout, {
-    responsive: true,
-    displayModeBar: true,
-    displaylogo: false,
-    modeBarButtonsToRemove: ["toImage", "sendDataToCloud"],
-  });
-  console.timeEnd("xtime");
-}
-
-function generateSpherePoints(centerX, centerY, centerZ, radius) {
-  const points = { x: [], y: [], z: [] };
-  const segments = 20;
-  const golden_ratio = (1 + Math.sqrt(5)) / 2;
-  const angle_increment = Math.PI * 2 * golden_ratio;
-
-  // 使用斐波那契球面分佈來生成點
-  for (let i = 0; i < segments * segments; i++) {
-    const t = i / (segments * segments - 1); //讓t歸一化，介於[0,1]
-    const inclination = Math.acos(1 - 2 * t); //極角，括弧裡面[1,-1]，也就是arccos可以運作的範圍
-    const azimuth = angle_increment * i; //方位角
-
-    const x = centerX + radius * Math.sin(inclination) * Math.cos(azimuth);
-    const y = centerY + radius * Math.sin(inclination) * Math.sin(azimuth);
-    const z = centerZ + radius * Math.cos(inclination);
-
-    points.x.push(x);
-    points.y.push(y);
-    points.z.push(z);
-  }
-
-  return points;
 }
 
 // 向量運算輔助函數，協助generateCylinderPoints進行生成
@@ -684,163 +885,71 @@ function crossProduct(a, b) {
     a[0] * b[1] - a[1] * b[0],
   ];
 }
+//prettier-ignore
+function createLatticeBox(cell,nx,ny) {
+  //消除之前的晶格框，消除記憶體
+  moleculeGroup.children.forEach(child => {
+      if(child.userData && child.userData.isLatticeBox) {
+          moleculeGroup.remove(child);
+          if(child.geometry) child.geometry.dispose();
+          if(child.material) child.material.dispose();
+      }
+  });  
 
-//嘗試使用cylinder來書寫bonding的形成
-function generateCylinderPoints(x1, y1, z1, x2, y2, z2, radius) {
-  const segments = 16;
-  const vertices = [];
-  const indices = [];
+  const boxVecA = new THREE.Vector3().fromArray(cell[0]);
+  const boxVecB = new THREE.Vector3().fromArray(cell[1]);
+  const boxVecC = new THREE.Vector3().fromArray(cell[2]);
 
-  // 計算圓柱體方向向量
-  const direction = [x2 - x1, y2 - y1, z2 - z1];
-  const directionNorm = normalize(direction);
+  //設定材質 (基本邊的)
+  const defaultLineMaterial = new THREE.LineBasicMaterial({
+    color: 0x00ffff,
+    linewidth: 2,
+  });
 
-  // 創建一個垂直於方向向量的向量
-  let perpendicular;
-  if (Math.abs(directionNorm[1]) < 0.9) {
-    // 如果方向向量不是接近垂直，使用y軸叉積
-    perpendicular = normalize(crossProduct([0, 1, 0], directionNorm));
-  } else {
-    // 如果方向向量接近垂直，使用z軸叉積
-    perpendicular = normalize(crossProduct([0, 0, 1], directionNorm));
-  }
+  //設定材質 (a,b,c的)
+  const lineMaterialA = new THREE.LineBasicMaterial({color:0xff0000,linewidth:2})
+  const lineMaterialB = new THREE.LineBasicMaterial({color:0x00ff00,linewidth:2})
+  const lineMaterialC = new THREE.LineBasicMaterial({color:0x0000ff,linewidth:2})
 
-  // 計算第二個垂直向量完成正交基底
-  const perpendicular2 = crossProduct(directionNorm, perpendicular);
-
-  // 創建圓柱體的頂點
-  for (let i = 0; i <= segments; i++) {
-    const theta = (i * 2 * Math.PI) / segments;
-    const cosTheta = Math.cos(theta);
-    const sinTheta = Math.sin(theta);
-
-    // 使用正交基底計算圓周上的點
-    const rx = perpendicular[0] * cosTheta + perpendicular2[0] * sinTheta;
-    const ry = perpendicular[1] * cosTheta + perpendicular2[1] * sinTheta;
-    const rz = perpendicular[2] * cosTheta + perpendicular2[2] * sinTheta;
-
-    // 底部頂點
-    vertices.push([x1 + radius * rx, y1 + radius * ry, z1 + radius * rz]);
-
-    // 頂部頂點
-    vertices.push([x2 + radius * rx, y2 + radius * ry, z2 + radius * rz]);
-  }
-
-  // 生成三角形索引
-  for (let i = 0; i < segments * 2; i += 2) {
-    indices.push(i, i + 1, i + 2, i + 1, i + 3, i + 2);
-  }
-
-  const x = vertices.map((v) => v[0]);
-  const y = vertices.map((v) => v[1]);
-  const z = vertices.map((v) => v[2]);
-
-  return {
-    type: "mesh3d",
-    x: x,
-    y: y,
-    z: z,
-    i: indices.filter((_, i) => i % 3 === 0),
-    j: indices.filter((_, i) => i % 3 === 1),
-    k: indices.filter((_, i) => i % 3 === 2),
-    color: "gray",
-    opacity: 1,
-  };
-}
-
-function createLatticeBox(cell) {
-  const [a, b, c] = cell;
-  const vertices = [
-    [0, 0, 0],
-    [...a],
-    [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
-    [...b],
-    [...c],
-    [c[0] + a[0], c[1] + a[1], c[2] + a[2]],
-    [c[0] + a[0] + b[0], c[1] + a[1] + b[1], c[2] + a[2] + b[2]],
-    [c[0] + b[0], c[1] + b[1], c[2] + b[2]],
-  ];
-
-  // 創建三個基向量的跡線
+  //定義abc軸
   const baseVectors = [
-    {
-      // a 向量 (紅色)
-      x: [0, a[0]],
-      y: [0, a[1]],
-      z: [0, a[2]],
-      color: "red",
-      name: "a",
-    },
-    {
-      // b 向量 (綠色)
-      x: [0, b[0]],
-      y: [0, b[1]],
-      z: [0, b[2]],
-      color: "green",
-      name: "b",
-    },
-    {
-      // c 向量 (藍色)
-      x: [0, c[0]],
-      y: [0, c[1]],
-      z: [0, c[2]],
-      color: "blue",
-      name: "c",
-    },
+    { start: new THREE.Vector3(0, 0, 0), end: boxVecA.clone(), material: lineMaterialA },
+    { start: new THREE.Vector3(0, 0, 0), end: boxVecB.clone(), material: lineMaterialB },
+    { start: new THREE.Vector3(0, 0, 0), end: boxVecC.clone(), material: lineMaterialC }
+  ]
+
+  const remainingEdges = [
+      // 底部剩餘的邊
+      [boxVecA.clone(), boxVecA.clone().add(boxVecB)],
+      [boxVecB.clone(), boxVecA.clone().add(boxVecB)],
+      // 頂部四邊
+      [boxVecC.clone(), boxVecC.clone().add(boxVecA)],
+      [boxVecC.clone(), boxVecC.clone().add(boxVecB)],
+      [boxVecC.clone().add(boxVecA), boxVecC.clone().add(boxVecA).add(boxVecB)],
+      [boxVecC.clone().add(boxVecB), boxVecC.clone().add(boxVecA).add(boxVecB)],
+      // 連接底部和頂部的其餘邊
+      [boxVecA.clone(), boxVecA.clone().add(boxVecC)],
+      [boxVecB.clone(), boxVecB.clone().add(boxVecC)],
+      [boxVecA.clone().add(boxVecB), boxVecA.clone().add(boxVecB).add(boxVecC)]
   ];
 
-  // 創建完整的晶格框（灰色）
-  const edges = [
-    [0, 1],
-    [1, 2],
-    [2, 3],
-    [3, 0], // 底部
-    [4, 5],
-    [5, 6],
-    [6, 7],
-    [7, 4], // 頂部
-    [0, 4],
-    [1, 5],
-    [2, 6],
-    [3, 7], // 連接線
-  ];
-
-  const traces = [];
-
-  // 添加基向量
-  baseVectors.forEach((vector) => {
-    traces.push({
-      type: "scatter3d",
-      mode: "lines",
-      x: vector.x,
-      y: vector.y,
-      z: vector.z,
-      line: {
-        width: 10,
-        color: vector.color,
-      },
-      name: vector.name,
-      showlegend: false,
-      hoverinfo: "none",
-    });
+  //開始繪製 abc
+  baseVectors.forEach(({start, end, material}) => {
+      const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+      const line = new THREE.Line(geometry, material);
+      line.userData = { isLatticeBox: true };
+      moleculeGroup.add(line);
+  });
+  
+  // 繪製其餘的邊 
+  remainingEdges.forEach(([start, end]) => {
+      const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+      const line = new THREE.Line(geometry, defaultLineMaterial);
+      line.userData = { isLatticeBox: true };
+      moleculeGroup.add(line);
   });
 
-  // 添加完整晶格框
-  traces.push({
-    type: "scatter3d",
-    mode: "lines",
-    x: edges.flatMap(([i, j]) => [vertices[i][0], vertices[j][0], null]),
-    y: edges.flatMap(([i, j]) => [vertices[i][1], vertices[j][1], null]),
-    z: edges.flatMap(([i, j]) => [vertices[i][2], vertices[j][2], null]),
-    line: {
-      width: 2.5,
-      color: "grey",
-    },
-    hoverinfo: "none",
-    showlegend: false,
-  });
 
-  return traces;
 }
 
 //prettier-ignore
@@ -892,125 +1001,3 @@ function getElementSymbol(atomicNumber) {
 window.addEventListener("resize", function () {
   Plotly.Plots.resize("plot");
 });
-
-// function createBonds(atoms, cell, bondInfo) {
-//   const { bonds } = bondInfo;
-//   const traces = [];
-
-//   const x = [];
-//   const y = [];
-//   const z = [];
-//   const hovertext = [];
-
-//   bonds.forEach((bond) => {
-//     x.push(bond.from.x, bond.to.x, null);
-//     y.push(bond.from.y, bond.to.y, null);
-//     z.push(bond.from.z, bond.to.z, null);
-//     hovertext.push(
-//       `${bond.from.element}-${bond.to.element}: ${bond.distance.toFixed(3)} Å`,
-//       `${bond.from.element}-${bond.to.element}: ${bond.distance.toFixed(3)} Å`,
-//       null
-//     );
-//   });
-
-//   traces.push({
-//     type: "scatter3d",
-//     mode: "lines",
-//     x: x,
-//     y: y,
-//     z: z,
-//     line: {
-//       width: 5,
-//       color: "#888888",
-//     },
-//     hoverinfo: "text",
-//     text: hovertext,
-//     name: "Chemical Bonds",
-//     showlegend: true,
-//   });
-
-//   return traces;
-// }
-// function createBonds(atoms, cell, bondInfo) {
-//   const { bonds } = bondInfo;
-//   const traces = [];
-
-//   bonds.forEach((bond) => {
-//     // 計算總距離
-//     const totalDistance = bond.distance;
-
-//     // 獲取原子半徑
-//     const r1 = getAtomRadius(bond.from.element) * 0.006;
-//     const r2 = getAtomRadius(bond.to.element) * 0.006;
-
-//     // 計算兩原子中心之間的向量
-//     const dx = bond.to.x - bond.from.x;
-//     const dy = bond.to.y - bond.from.y;
-//     const dz = bond.to.z - bond.from.z;
-
-//     // 計算原子表面之間的實際距離
-//     const surfaceDistance = totalDistance - r1 - r2;
-
-//     // 計算調整後的中點位置（從第一個原子表面開始）
-//     const t = r1 / totalDistance; // 第一個原子表面的比例位置
-//     const t2 = (r1 + surfaceDistance / 2) / totalDistance; // 中點的比例位置
-
-//     // 從第一個原子表面開始的點
-//     const surfaceStartX = bond.from.x + dx * t;
-//     const surfaceStartY = bond.from.y + dy * t;
-//     const surfaceStartZ = bond.from.z + dz * t;
-
-//     // 真正的中點位置
-//     const midX = bond.from.x + dx * t2;
-//     const midY = bond.from.y + dy * t2;
-//     const midZ = bond.from.z + dz * t2;
-
-//     // 第二個原子表面開始的點
-//     const surfaceEndX = bond.to.x - dx * (r2 / totalDistance);
-//     const surfaceEndY = bond.to.y - dy * (r2 / totalDistance);
-//     const surfaceEndZ = bond.to.z - dz * (r2 / totalDistance);
-
-//     // 第一個原子到中點的部分 (第一個原子的顏色)
-//     traces.push({
-//       type: "scatter3d",
-//       mode: "lines",
-//       x: [surfaceStartX, midX],
-//       y: [surfaceStartY, midY],
-//       z: [surfaceStartZ, midZ],
-//       line: {
-//         width: 8,
-//         color: getAtomColor(bond.from.element),
-//         opacity: 0.3,
-//       },
-//       hoverinfo: "text",
-//       text: `${bond.from.element}-${bond.to.element}: ${bond.distance.toFixed(
-//         3
-//       )} Å`,
-//       name: `${bond.from.element}-${bond.to.element}`,
-//       showlegend: false,
-//     });
-
-//     // 中點到第二個原子的部分 (第二個原子的顏色)
-//     traces.push({
-//       type: "scatter3d",
-//       mode: "lines",
-//       x: [midX, surfaceEndX],
-//       y: [midY, surfaceEndY],
-//       z: [midZ, surfaceEndZ],
-//       line: {
-//         width: 8,
-//         color: getAtomColor(bond.to.element),
-//         opacity: 0.3,
-//       },
-//       hoverinfo: "text",
-//       text: `${bond.from.element}-${bond.to.element}: ${bond.distance.toFixed(
-//         3
-//       )} Å`,
-//       name: `${bond.from.element}-${bond.to.element}`,
-//       showlegend: false,
-//     });
-//   });
-
-//   return traces;
-// }
-console.log("testing");
