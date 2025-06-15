@@ -117,16 +117,18 @@ nav .nav-content {
 .material-info {
     flex: 1;
     padding: 3rem;
-    min-width: 300px;
+    /* min-width: 300px; */
     margin-left:2%;
+    font-size: larger;
 
 }
 .material-details {
     flex: 1;
     padding: 1rem;
-    min-width: 300px;
+    min-width: 30rem;
     padding: 3rem;
     margin-left:2%;
+    font-size: larger;
 }
 
 .tab-content {
@@ -141,16 +143,20 @@ nav .nav-content {
 .visualization-area {
     /* flex: 1; */
     background: #2a2d35;
-    min-height: 450px;
-    margin: 1rem;
-    border-radius: 8px;
+    height: 29rem;
+    /* margin: 1rem; */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 800px;
+    width: 50rem;
     margin-right: 6rem;
     /* overflow: hidden;  */
+    /* transition:opacity 0.3s ease,  visibility 0.3s ease;
+    opacity:1;
+    visibility: visible; */
 }
+
+
 
 /* 下拉選單相關樣式修改 */
 .dropdown {
@@ -251,28 +257,28 @@ transform: rotate(-135deg);
     height: 100%;
 }
 
-.direction {
+/* .direction {
     position: absolute;
     bottom: -3.5rem;
     right:-20rem;
     display: flex;
     flex-direction: row;
-    gap: 0.4rem; /* 按鈕之間的間距 */
-    opacity:0; /*default是透明*/
-    visibility: hidden;/*先透明*/
+    gap: 0.4rem; 
+    opacity:0; 
+    visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .direction.show{
-    opacity: 1;/*完全不透明*/
-    visibility:visible;/*可見*/
+    opacity: 1;
+    visibility:visible;
 }
 
 
 .direction button {
     width: 3rem;
     height:3rem ;
-    /* border: 1px solid #679164; */
+
     background-color: #808e8e;
     cursor: pointer;
     border-radius: 4px;
@@ -282,5 +288,59 @@ transform: rotate(-135deg);
 
 .direction button:hover {
     background: rgba(65, 105, 225, 0.3);
+} */
+.direction {
+    position: absolute;
+    bottom: -3.5rem;
+    right: -20rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.direction.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.direction button {
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e0;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.direction button:hover {
+    background: linear-gradient(145deg, #3a3a3a, #252525);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 15px rgba(100, 149, 237, 0.2);
+    color: #ffffff;
+}
+
+.direction button:active {
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.direction button:focus {
+    outline: none;
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 0 2px rgba(100, 149, 237, 0.5);
+}

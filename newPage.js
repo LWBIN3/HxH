@@ -118,11 +118,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     item.addEventListener("click", async function (e) {
       const action = this.textContent.trim();
       directionPanel.classList.add("show");
-      //用toggle的話就是一直切換
-      if (action === "Hide") {
+      //用toggle的話就是一直切換，所以如果我一直按show or hide 裡面的按鈕他就一下出現一下消失
+      if (action === "Stop") {
         // 隱藏視覺化
         directionPanel.classList.remove("show");
-        dropdownButton.querySelector(".button-text").textContent = "Hide";
+        dropdownButton.querySelector(".button-text").textContent = "Stop";
+        stopRendering();
       } else if (this.classList.contains("has-submenu")) {
         // 展開子選單，不執行其他操作
         e.stopPropagation();
@@ -141,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       e.stopPropagation();
       currentPeriodicSize = this.textContent.trim();
       dropdownButton.querySelector(".button-text").textContent = "Show";
-
+      startRendering();
       // 獲取材料數據並顯示視覺化
       if (materialName && atomicNumbers) {
         const structureData = await initCheck(materialName, atomicNumbers);
@@ -203,7 +204,7 @@ const camera = new THREE.OrthographicCamera(
   viewHeight / 2, // top
   -viewHeight / 2, // bottom
   0.1, // near (近裁面)
-  1000 // far (遠裁面)
+  10000 // far (遠裁面)
 );
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -480,6 +481,8 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
   createBonds(expandedAtoms, cell, bondInfo);
   //呼叫createLatticebox把晶格框架做出來
   createLatticeBox(cell, nx, ny);
+  initializeCameraView();
+
   // 按鈕事件監聽器，處理相機視角
   const cameraDirection = document.querySelector(".direction");
   cameraDirection.addEventListener("click", (e) => {
@@ -499,10 +502,99 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
         axis = buttonId;
         isReverse = false;
       }
+
       // 呼叫相機調整函數
       setCameraViewAlongAxis(axis, isReverse);
     }
   });
+}
+
+// 添加一個初始化相機位置的函數
+function initializeCameraView() {
+  const boundingBox = new THREE.Box3().setFromObject(moleculeGroup);
+  const center = new THREE.Vector3();
+  const size = new THREE.Vector3();
+
+  boundingBox.getCenter(center);
+  boundingBox.getSize(size);
+
+  // 計算適合的初始距離
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const cameraDistance = maxDim * 20;
+
+  camera.position.set(
+    center.x + cameraDistance,
+    center.y + cameraDistance,
+    center.z + cameraDistance
+  );
+
+  camera.lookAt(center);
+  camera.updateProjectionMatrix();
+
+  // 設定 OrbitControls
+  controls.target.copy(center);
+  controls.update();
+
+  // 確保渲染
+  renderer.render(scene, camera);
+}
+
+// 修改你的 setCameraViewAlongAxis 函數
+function setCameraViewAlongAxis(axis, isReverse = false) {
+  const boundingBox = new THREE.Box3().setFromObject(moleculeGroup);
+  const center = new THREE.Vector3();
+  const size = new THREE.Vector3();
+
+  boundingBox.getCenter(center);
+  boundingBox.getSize(size);
+
+  console.log("center:", center.toArray());
+
+  // 根據結構大小計算合適的相機距離
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const cameraDistance = maxDim * 3; // 調整倍數，避免太遠
+
+  // 定義各軸向的相機位置偏移
+  let offsetFromCenter;
+
+  switch (axis) {
+    case "a":
+      offsetFromCenter = new THREE.Vector3(
+        isReverse ? -cameraDistance : cameraDistance,
+        0,
+        0
+      );
+      break;
+    case "b":
+      offsetFromCenter = new THREE.Vector3(
+        0,
+        isReverse ? -cameraDistance : cameraDistance,
+        0
+      );
+      break;
+    case "c":
+      offsetFromCenter = new THREE.Vector3(
+        0,
+        0,
+        isReverse ? -cameraDistance : cameraDistance
+      );
+      break;
+    default:
+      console.warn("未知的軸向:", axis);
+      return;
+  }
+
+  // 設定相機位置和目標
+  camera.position.copy(center).add(offsetFromCenter);
+  camera.lookAt(center);
+  camera.updateProjectionMatrix();
+
+  // 更新 OrbitControls
+  controls.target.copy(center);
+  controls.update();
+
+  // 強制渲染
+  renderer.render(scene, camera);
 }
 
 // 封裝相機調整函數
@@ -609,13 +701,31 @@ window.addEventListener("mousemove", (event) => {
   }
 });
 
+let isRenderingActive = true;
+let animationId = null;
+
 // 建立渲染迴圈
 function animate() {
-  requestAnimationFrame(animate); // 要求瀏覽器在下一個動畫影格呼叫 animate 函數
-
+  if (isRenderingActive) {
+    animationId = requestAnimationFrame(animate); // 要求瀏覽器在下一個動畫影格呼叫 animate 函數
+  }
   controls.update(); // 如果使用了 controls (如 OrbitControls)，需要更新它
-
   renderer.render(scene, camera); // 呼叫渲染器來繪製場景和相機所見到的畫面
+}
+
+function startRendering() {
+  if (!isRenderingActive) {
+    isRenderingActive = true;
+    animate();
+  }
+}
+
+function stopRendering() {
+  isRenderingActive = false;
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
 }
 
 // 啟動渲染迴圈
@@ -999,4 +1109,3 @@ function getElementSymbol(atomicNumber) {
   );
   return reverseElementMap[atomicNumber] || "Unknown";
 }
-console.log("check again");
