@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -6,30 +7,38 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     background: #1A1C21;
     color: #fff;
     font-family: 'Ubuntu', sans-serif;
-    padding-top: 40px;
+    padding-top: 80px;
+    /* 增加頂部間距 */
 }
 
 ::-webkit-scrollbar {
     width: 10px;
 }
+
 ::-webkit-scrollbar-track {
     background: #1A1C21;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #76809e;
     border-radius: 5px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #ffffff;
 }
 
 nav {
     position: fixed;
-    height: 5px;
-    left: 0;
+    height: 40px;
+    /* 固定導航欄高度 */
+
     top: 0;
     width: 100%;
     background: linear-gradient(145deg, #4169e1, #5177e5);
@@ -78,12 +87,16 @@ nav .nav-content {
 }
 
 .stats-bar {
-    background: #23252c;
     padding: 1rem;
+    background: #23252c;
+    border-radius: 0.7rem;
     display: flex;
     gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
+    width: 95%;                    /* 填滿父容器 */
+    max-width: 100rem;              /* 設定最大寬度避免過寬 */
+    margin: 0rem 2rem 0rem 2.5rem;
 }
 
 .stat-item {
@@ -107,28 +120,118 @@ nav .nav-content {
     color: white;
 }
 
+/* 關鍵改進：修正 content-area 的布局 */
 .content-area {
     display: flex;
-    margin-top: 1rem;
     padding: 10px;
+    gap: 20px;
+    /* 添加間距 */
+    min-height: 70vh;
+    /* 改為 min-height */
     flex-wrap: wrap;
 }
 
+/* 響應式布局改進 */
 .material-info {
     flex: 1;
-    padding: 3rem;
-    /* min-width: 300px; */
-    margin-left:2%;
+    min-width: 350px;
+    /* 設定最小寬度 */
+    padding: 2rem;
     font-size: larger;
-
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin: 1rem 1rem 0rem 2rem; /* 上 右 下 左 */
+    height: 35rem;          /* 固定高度 */
+    max-height: 46rem;      /* 最大高度 */
+    min-height: 35rem;      /* 最小高度 */
+    max-width: 48rem;           /* 固定寬度（會覆蓋 flex） */
 }
-.material-details {
+
+.visualization-area {
     flex: 1;
-    padding: 1rem;
-    min-width: 30rem;
-    padding: 3rem;
-    margin-left:2%;
+    width:100%;
+    min-width: 380px;
+    max-width: 48.5rem;
+    background: #2a2d35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    position: relative;
+    height: 35rem;
+    margin: 1rem 2rem 0rem 1rem; /* 上 右 下 左 */
+}
+
+#threejs-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#threejs-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 響應式斷點 */
+@media (max-width: 1024px) {
+    .content-area {
+        flex-direction: column;
+    }
+
+    .material-info,
+    .visualization-area {
+        min-width: 100%;
+        flex: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .material-info {
+        min-width: 100%;
+        padding: 1rem;
+    }
+
+    .visualization-area {
+        min-width: 100%;
+        min-height: 400px;
+    }
+}
+
+.info-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.info-table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    background-color: #5559c7;
+}
+
+.info-table td:first-child {
+    font-weight: bold;
+    width: 50%;
+    background-color: #485766;
+}
+
+/* 修正 material-details 的布局 */
+.maincontent {
+    width: 100%;
+    padding: 2rem;
+}
+
+.material-details {
+    max-width: 100rem;
+    width: 99%;
+    padding: 2rem;
     font-size: larger;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    min-width: 350px;
+    margin-left:0.5rem;
 }
 
 .tab-content {
@@ -140,25 +243,7 @@ nav .nav-content {
     display: flex;
 }
 
-.visualization-area {
-    /* flex: 1; */
-    background: #2a2d35;
-    height: 29rem;
-    /* margin: 1rem; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50rem;
-    margin-right: 6rem;
-    /* overflow: hidden;  */
-    /* transition:opacity 0.3s ease,  visibility 0.3s ease;
-    opacity:1;
-    visibility: visible; */
-}
-
-
-
-/* 下拉選單相關樣式修改 */
+/* 下拉選單相關樣式 */
 .dropdown {
     position: relative;
     width: 200px;
@@ -176,7 +261,7 @@ nav .nav-content {
     align-items: center;
     color: white;
     font-family: 'Ubuntu', sans-serif;
-    font-size: 1.3rem;  /* 與其他選項統一大小 */
+    font-size: 1.3rem;
 }
 
 .dropdown-button:hover {
@@ -189,14 +274,13 @@ nav .nav-content {
     top: 100%;
     left: 0;
     width: 100%;
-    background: #2a2d35;  /* 更深的背景色 */
+    background: #2a2d35;
     border-radius: 4px;
     margin-top: 4px;
-    z-index: 1000;  /* 確保下拉選單在上層 */
+    z-index: 1000;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* 新增：顯示下拉選單的類 */
 .dropdown-content.show {
     display: block;
 }
@@ -237,19 +321,19 @@ nav .nav-content {
 .has-submenu:hover .submenu {
     display: block;
 }
+
 .arrow {
-border: solid #666;
-border-width: 0 2px 2px 0;
-display: inline-block;
-padding: 3px;
-transform: rotate(45deg);
-transition: transform 0.2s;
+    border: solid #666;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg);
+    transition: transform 0.2s;
 }
 
 .arrow.up {
-transform: rotate(-135deg);
+    transform: rotate(-135deg);
 }
-
 
 .toolbar {
     position: relative;
@@ -257,44 +341,11 @@ transform: rotate(-135deg);
     height: 100%;
 }
 
-/* .direction {
-    position: absolute;
-    bottom: -3.5rem;
-    right:-20rem;
-    display: flex;
-    flex-direction: row;
-    gap: 0.4rem; 
-    opacity:0; 
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.direction.show{
-    opacity: 1;
-    visibility:visible;
-}
-
-
-.direction button {
-    width: 3rem;
-    height:3rem ;
-
-    background-color: #808e8e;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #ffffff;
-}
-
-.direction button:hover {
-    background: rgba(65, 105, 225, 0.3);
-} */
 .direction {
     position: absolute;
-    bottom: -3.5rem;
-    right: -20rem;
+    left: 10px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 0.4rem;
     opacity: 0;
     visibility: hidden;
@@ -317,14 +368,14 @@ transform: rotate(-135deg);
     font-weight: 600;
     color: #e0e0e0;
     transition: all 0.3s ease;
-    box-shadow: 
+    box-shadow:
         0 2px 6px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .direction button:hover {
     background: linear-gradient(145deg, #3a3a3a, #252525);
-    box-shadow: 
+    box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.15),
         0 0 15px rgba(100, 149, 237, 0.2);
@@ -332,15 +383,48 @@ transform: rotate(-135deg);
 }
 
 .direction button:active {
-    box-shadow: 
+    box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.4),
         inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .direction button:focus {
     outline: none;
-    box-shadow: 
+    box-shadow:
         0 2px 6px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1),
         0 0 0 2px rgba(100, 149, 237, 0.5);
+}
+
+thead,
+tfoot {
+    background-color: #2c5e77;
+    color: #fff;
+}
+
+tbody {
+    background-color: #e4f0f5;
+}
+
+table {
+    border-collapse: collapse;
+    border: 2px solid rgb(140 140 140);
+    font-family: sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+caption {
+    caption-side: bottom;
+    padding: 10px;
+}
+
+th,
+td {
+    border: 1px solid rgb(160 160 160);
+    padding: 8px 10px;
+}
+
+td {
+    text-align: center;
 }

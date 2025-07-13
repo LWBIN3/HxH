@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D database</title>
+    <title>Quinn</title>
     <link rel="icon" type="image/png" href="asset/QQfavicon.png">
     <link rel="stylesheet" href="newPage.css">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/kd-tree-javascript@1.0.3/kdTree.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    </head>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/TrackballControls.js"></script>
+</head>
+
 <body>
     <!-- 導航欄 -->
     <nav>
         <div class="nav-content">
             <div class="logo">
-                <a href="/project.html">Qorillaz.DB</a>
+                <a href="/project.html">Quinn.DB</a>
             </div>
             <ul class="nav-links">
                 <li><a href="#">Home</a></li>
                 <li><a href="#">Reference</a></li>
                 <li><a href="#">About</a></li>
-                <li><a href="#">More Info</a></li>
+                <li><a href="#">Info</a></li>
             </ul>
         </div>
     </nav>
@@ -53,27 +56,23 @@
             </div>
         </div>
     </div>
-    
+
 
     <!-- 介紹區以及視覺化區 -->
     <div class="content-area">
-        <div class="material-info">
-
-        </div>
+        <div class="material-info"></div>
         <div class="visualization-area" id="plot">
-        <div class="toolbar">
-            <div class="direction">
-            <button id = 'a'>a</button>
-            <button id = 'b'>b</button>
-            <button id = 'c'>c</button>
-            <button id = 'a*'>a*</button>
-            <button id = 'b*'>b*</button>
-            <button id = 'c*'>c*</button>
+            <div class="toolbar">
+                <div class="direction">
+                    <button id='a'>a</button>
+                    <button id='b'>b</button>
+                    <button id='c'>c</button>
+                    <button id='a*'>a*</button>
+                    <button id='b*'>b*</button>
+                    <button id='c*'>c*</button>
+                </div>
             </div>
         </div>
-        </div>
-
-
     </div>
     <!-- 主要內容區 -->
     <div class="maincontent">
@@ -84,4 +83,5 @@
 
     <script src="newPage.js"></script>
 </body>
+
 </html>

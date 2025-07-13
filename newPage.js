@@ -8,28 +8,37 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Overview的部份
   if (materialName && materialData) {
     document.querySelector(".material-info").innerHTML = `
-            <h1>${materialName}</h1>
-            </br>
-            <h2>Structure info:</h2>
-            <p>layer group: ${materialData.layergroup}
-            <p>layer group number: ${materialData.lgnum || "N/A"}
-            <p>Structure origin: ${materialData.label || "N/A"}
-            </br>
-            </br>
-            <h2>Stability:</h2>
-            <p>Energy above convex hull[eV/atom]: ${
-              materialData.ehull.toFixed(3) || "N/A"
-            } eV</p>
-            <p>Heat of formation: ${
-              materialData.hform.toFixed(3) || "N/A"
-            } eV</p>
-            <p>Dynamically stable: ${materialData.dyn_stab || "N/A"} </p>
-            </br>
-            <h2>Basic properties:</h2>
-            <p>Magnetic: ${materialData.magstate === "FM" ? "Yes" : "No"} </p>
-            <p>Out of plane dipole[e Å/unit cell]: 0 </p>
-            <p>Band gap[eV]: ${materialData.gap || "N/A"} </p>
-  
+      <h1>${materialName}</h1>
+      <h2>Structure info:</h2>
+      <table class="info-table">
+        <tr><td>Layer group</td><td>${materialData.layergroup}</td></tr>
+        <tr><td>Layer group number</td><td>${
+          materialData.lgnum || "N/A"
+        }</td></tr>
+        <tr><td>Structure origin</td><td>${
+          materialData.label || "N/A"
+        }</td></tr>
+      </table>
+      <h2>Stability:</h2>
+      <table class="info-table">
+        <tr><td>Energy above convex hull [eV/atom]</td><td>${
+          materialData.ehull?.toFixed(3) ?? "N/A"
+        }</td></tr>
+        <tr><td>Heat of formation [eV]</td><td>${
+          materialData.hform?.toFixed(3) ?? "N/A"
+        }</td></tr>
+        <tr><td>Dynamically stable</td><td>${
+          materialData.dyn_stab || "N/A"
+        }</td></tr>
+      </table>
+      <h2>Basic properties:</h2>
+      <table class="info-table">
+        <tr><td>Magnetic</td><td>${
+          materialData.magstate === "FM" ? "Yes" : "No"
+        }</td></tr>
+        <tr><td>Out of plane dipole [e·Å/unit cell]</td><td>0</td></tr>
+        <tr><td>Band gap [eV]</td><td>${materialData.gap ?? "N/A"}</td></tr>
+      </table>
         `;
   } else {
     document.querySelector(
@@ -177,15 +186,30 @@ document.addEventListener("DOMContentLoaded", async function () {
   const materialList = parseChemicalFormula(materialName);
   const atomicNumbers = materialList.map((element) => elementMap[element]);
 
-  // 初始化時嘗試獲取並顯示結構
+  // 初始化時嘗試獲取並顯示結構，並自動啟動視覺化
   if (materialList.length > 0) {
     try {
       const structureData = await initCheck(materialName, atomicNumbers);
       if (structureData) {
-        console.log("Initialized data:", structureData);
+        // 自動執行 1x1 視覺化
+        currentPeriodicSize = "1x1x1";
+        startRendering();
+
+        // 更新按鈕文字
+        dropdownButton.querySelector(".button-text").textContent = "Show";
+
+        // 顯示方向控制面板
+        directionPanel.classList.add("show");
+
+        // 執行視覺化，使用 1x1 格式
+        const periodicSize = currentPeriodicSize
+          .replace(/\*/g, "x")
+          .slice(0, -2); // "1x1x1" -> "1x1"
+
+        initStructure(structureData, periodicSize);
       }
     } catch (error) {
-      console.error("Failed to catch data", error);
+      console.error("Failed to auto-initialize structure", error);
     }
   }
 });
@@ -257,11 +281,10 @@ pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
 // 使用 OrbitControls
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.update(); // 初始化控制項
-controls.enableDamping = true; //阻尼的感覺
-controls.dampingFacttor = 0.05; //係數調一下
-controls.rotateSpeed = 0.3;
+const controls = new THREE.TrackballControls(camera, renderer.domElement);
+// controls.enableDamping = true; //阻尼的感覺
+// controls.dampingFacttor = 0.02; //係數調一下
+controls.rotateSpeed = 2.4;
 
 // 創建分子模型組 (所有原子和鍵結都放在這個組裡面)
 const moleculeGroup = new THREE.Group();
@@ -270,7 +293,7 @@ scene.add(moleculeGroup); // 將組添加到主場景中
 // 開始處理材料視覺化
 async function initCheck(materialName, atomicNumbers) {
   try {
-    const response = await fetch("http://localhost:3000/api/infovisualize");
+    const response = await fetch("/api/infovisualize");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -284,7 +307,7 @@ async function initCheck(materialName, atomicNumbers) {
         areArraysEquivalent(entryNumbers, atomicNumbers)
       ) {
         matchedData = item["1"];
-        console.log("Match found：", entryNumbers, atomicNumbers);
+        // console.log("Match found：", entryNumbers, atomicNumbers);
         break;
       }
     }
@@ -334,7 +357,7 @@ function areArraysEquivalent(arr1, arr2) {
 function initStructure(data, periodicSize) {
   try {
     // 檢查數據格式
-    console.log("Received data:", data);
+    // console.log("Received data:", data);
 
     // 適應不同的數據格式
     const cellData = Array.isArray(data.cell)
@@ -367,10 +390,10 @@ function initStructure(data, periodicSize) {
       });
     }
 
-    console.log("Processed data:", {
-      cell: cell,
-      atoms: atoms,
-    });
+    // console.log("Processed data:", {
+    //   cell: cell,
+    //   atoms: atoms,
+    // });
 
     createStructureVisualization(atoms, cell, periodicSize);
   } catch (error) {
@@ -451,7 +474,7 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
       });
     }
   }
-  console.log(expandedAtoms);
+  // console.log(expandedAtoms);
   expandedAtoms.forEach((atom) => {
     const skinColor = getAtomColor(atom.element);
     const sphereMaterial = new THREE.MeshPhongMaterial({
@@ -475,7 +498,7 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
   //呼叫getBondTypes把鍵結算出來
   const bondInfo = getBondTypes(expandedAtoms);
   const expandedBonds = bondInfo.bonds;
-  console.log(bondInfo);
+  // console.log(bondInfo);
 
   //呼叫createBonds把鍵結做出來
   createBonds(expandedAtoms, cell, bondInfo);
@@ -539,64 +562,6 @@ function initializeCameraView() {
   renderer.render(scene, camera);
 }
 
-// 修改你的 setCameraViewAlongAxis 函數
-function setCameraViewAlongAxis(axis, isReverse = false) {
-  const boundingBox = new THREE.Box3().setFromObject(moleculeGroup);
-  const center = new THREE.Vector3();
-  const size = new THREE.Vector3();
-
-  boundingBox.getCenter(center);
-  boundingBox.getSize(size);
-
-  console.log("center:", center.toArray());
-
-  // 根據結構大小計算合適的相機距離
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const cameraDistance = maxDim * 3; // 調整倍數，避免太遠
-
-  // 定義各軸向的相機位置偏移
-  let offsetFromCenter;
-
-  switch (axis) {
-    case "a":
-      offsetFromCenter = new THREE.Vector3(
-        isReverse ? -cameraDistance : cameraDistance,
-        0,
-        0
-      );
-      break;
-    case "b":
-      offsetFromCenter = new THREE.Vector3(
-        0,
-        isReverse ? -cameraDistance : cameraDistance,
-        0
-      );
-      break;
-    case "c":
-      offsetFromCenter = new THREE.Vector3(
-        0,
-        0,
-        isReverse ? -cameraDistance : cameraDistance
-      );
-      break;
-    default:
-      console.warn("未知的軸向:", axis);
-      return;
-  }
-
-  // 設定相機位置和目標
-  camera.position.copy(center).add(offsetFromCenter);
-  camera.lookAt(center);
-  camera.updateProjectionMatrix();
-
-  // 更新 OrbitControls
-  controls.target.copy(center);
-  controls.update();
-
-  // 強制渲染
-  renderer.render(scene, camera);
-}
-
 // 封裝相機調整函數
 function setCameraViewAlongAxis(axis, isReverse = false) {
   const boundingBox = new THREE.Box3().setFromObject(moleculeGroup);
@@ -606,53 +571,51 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
   boundingBox.getCenter(center);
   boundingBox.getSize(size);
 
-  console.log("center:", center.toArray());
-
-  // 根據結構大小計算合適的相機距離
   const maxDim = Math.max(size.x, size.y, size.z);
-  const cameraDistance = maxDim * 10; // 可以調整這個倍數
+  const cameraDistance = maxDim * 10;
 
-  // 定義各軸向的相機位置偏移
   let offsetFromCenter;
+  let upDirection; // 🔥fire! 新增：定義上方向
 
   switch (axis) {
     case "a":
-      // 沿著 X 軸觀看 (從右側或左側看)
       offsetFromCenter = new THREE.Vector3(
         isReverse ? -cameraDistance : cameraDistance,
         0,
         0
       );
+      upDirection = new THREE.Vector3(0, 0, 1); // Z軸向上
       break;
     case "b":
-      // 沿著 Y 軸觀看 (從上方或下方看)
       offsetFromCenter = new THREE.Vector3(
         0,
         isReverse ? -cameraDistance : cameraDistance,
         0
       );
+      upDirection = new THREE.Vector3(0, 0, 1); // Z軸向上
       break;
     case "c":
-      // 沿著 Z 軸觀看 (從前方或後方看)
       offsetFromCenter = new THREE.Vector3(
         0,
         0,
         isReverse ? -cameraDistance : cameraDistance
       );
+      upDirection = new THREE.Vector3(0, 1, 0); // Y軸向上
       break;
     default:
       console.warn("未知的軸向:", axis);
       return;
   }
 
-  // 設定相機位置和目標
+  // 設定相機
   camera.position.copy(center).add(offsetFromCenter);
+  camera.up.copy(upDirection); // 🔥 關鍵：設置上方向
   camera.lookAt(center);
   camera.updateProjectionMatrix();
 
-  // 更新 OrbitControls
+  // 更新 TrackballControls
   controls.target.copy(center);
-  controls.update();
+  controls.update(); // 🔥
 }
 
 // 2. 建立 Raycaster + mouse
@@ -672,7 +635,6 @@ tooltip.style.pointerEvents = "none";
 tooltip.style.display = "none";
 document.body.appendChild(tooltip);
 
-// 4. 監聽滑鼠事件
 // 修正滑鼠事件監聽器
 window.addEventListener("mousemove", (event) => {
   // 獲取容器的邊界框
@@ -1108,4 +1070,31 @@ function getElementSymbol(atomicNumber) {
     {}
   );
   return reverseElementMap[atomicNumber] || "Unknown";
+}
+
+function setupResizeObserver() {
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      if (entry.target === container) {
+        onWindowResize();
+      }
+    }
+  });
+
+  if (container) {
+    resizeObserver.observe(container);
+  }
+}
+
+function onWindowResize() {
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // 更新相機長寬比
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+
+  // 更新渲染器尺寸
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
 }
