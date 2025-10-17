@@ -1098,3 +1098,4 @@ function onWindowResize() {
   renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
+console.log("fuck");
