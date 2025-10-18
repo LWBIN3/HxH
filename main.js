@@ -91,12 +91,6 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
       </div>
   `;
-  //   <select id="calcmethod">
-  //   <option value="gap">PBE</option>
-  //   <option value="gap_hse">HSE</option>
-  //   <option value="gap_gw">GW</option>
-  // </select>
-  // 將模態視窗加入到 body
   document.body.insertAdjacentHTML("beforeend", modalHTML);
 
   // 獲取必要的元素

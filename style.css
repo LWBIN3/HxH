@@ -1,7 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Smooch+Sans:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Giga:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 
 * {
     margin: 0;
@@ -14,6 +11,7 @@ body {
     background: #1A1C21;
     min-height: 100vh;
     overflow-x: hidden;/* 防止水平滾動 */
+    font-family: "Roboto Mono", monospace;
 }
 
 /* 自訂滾動條樣式 */
@@ -38,10 +36,9 @@ nav {
     top: 0;
     width: 100%;
     background: linear-gradient(145deg, #4169e1, #5177e5);
-
     padding: 20px;
     box-shadow: 0 2px 10px rgba(65, 105, 225, 0.2);
-    font-family: "Ubuntu", serif;
+    font-family: "Roboto Mono", monospace;
     z-index: 2; /* 確保nav保持在上 */
 }
 
@@ -136,6 +133,14 @@ nav .nav-content {
 .search-input::placeholder {
     color: rgba(255, 255, 255, 0.5);/* 淡灰色的提示文字 */
 }
+
+.search-separator {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
 /*篩選功能還有搜尋功能的調整*/
 .search-btn {
     display: flex;
@@ -208,7 +213,6 @@ nav .nav-content {
     font-weight: 500;
     font-size: 14px;
     color: #ffffff;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }

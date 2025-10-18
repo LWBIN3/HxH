@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qorillaz</title>
+    <title>Quinn</title>
     <link rel="icon" type="image/png" href="asset/QQfavicon.png">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 </head>
 <body>
-    <!-- 導航欄的設置 -->
+    <!-- Navigation bar -->
     <nav>
         <div class="nav-content">
             <div class="logo">
-                <a href="/project.html">Qorillaz.DB</a>
+                <a href="/project.html">Quinn.DB</a>
             </div>
             <ul class="nav-links">
                 <li><a href="https://www.google.com.tw/?hl=zh_TW">Home</a></li>
@@ -24,12 +24,14 @@
             </ul>
         </div>
     </nav>
-    <!-- 中間搜尋的位置 -->
+    <!-- Search part -->
     <section class="home">
         <img src="asset/Qorillaz.DB-removebg-preview.png" class="logo-img">
         <div class="search-container">
             <div class="search-form">
-                <input type="text" class="search-input" placeholder="Search Database...">
+                <input type="text" class="search-input" placeholder="2D">
+                <span class="search-separator">|</span>
+                <input type="text" class="search-input" placeholder="Slab">
                 <button type="submit" class="search-btn" id="filter">
                     <img src="asset/filter.svg" alt="filter">
                 </button>
@@ -39,24 +41,25 @@
             </div>
         </div>
     </section>
-    <!-- 主頁的下半部份 -->
+    <!-- Lower part of the main page -->
     <div class="filteredMaterials">
-        <!-- 放置材料的地方 -->
+        <!-- Table i place materials -->
         <table>
             <thead>
                 <tr>
                     <th>Formula</th>
-                    <th>Energy above convex hull [ev/atom]</th>
-                    <th>Heat of formation [ev/atom]</th>
-                    <th>Band gap [ev]</th>
-                    <th>Magnetic</th>
-                    <th>Layer group</th>
+                    <th>Binding Energy [meV/Å²]</th>
+                    <th>Polarity</th>
+                    <th>Crystal System</th>
+                    <th>Layer</th>
+                    <th>Crystal Plane</th>
+
                 </tr>
             </thead>
             <tbody id="MaterialList" class="MaterialList">
             </tbody>
         </table>
-        <!-- 頁數的控制 -->
+        <!-- Page control -->
         <span class="pagectrl">
             <select id="itemsPerPage">
             <option value="15">15 / page</option>
