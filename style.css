@@ -31,52 +31,56 @@ body {
 /* 導航欄的設置 */
 nav {
     position: fixed;
-    height: 5px;
     left: 0;
     top: 0;
     width: 100%;
     background: linear-gradient(145deg, #4169e1, #5177e5);
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 2px 10px rgba(65, 105, 225, 0.2);
     font-family: "Roboto Mono", monospace;
-    z-index: 2; /* 確保nav保持在上 */
+    z-index: 2;
+    min-height: 60px;
 }
 
 nav .nav-content {
     display: flex;
     align-items: center;
-    justify-content: space-between;/*我讓Qorillaz和其他導航鍵以空格分開 */
-    height: 100%;
-    max-width: 80%;
-    margin: auto;/*外邊框的設置，我這邊用來置中*/
+    justify-content: space-between;
+    width: 100%;
+    max-width: 90%;
+    margin: auto;
+    min-height: 30px;
 }
 
 .nav-content .logo a {
-    position: relative;
-    right: 8vw;
-    font-size: 30px;
+    font-size: clamp(20px, 4vw, 30px);
     font-weight: 500;
     color: #f5f7fb;
     text-shadow: 1px 1px 2px #000;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-content .nav-links {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
 .nav-content .nav-links li {
-    list-style: none;/*把前面的裝飾拿掉，也就是圓圈圈*/
-    margin: 0 8px;
-
+    list-style: none;
+    margin: 0;
 }
 
 .nav-links li a {
-    font-size: 26px;
+    font-size: clamp(10px, 2.5vw, 25px);
     font-weight: 500;
     color: #dbd7d7;
-    padding: 10px 4px;
+    padding: 10px clamp(4px, 1vw, 8px);
     text-shadow: 1px 1px 2px #000;
+    white-space: nowrap;
+    transition: font-size 0.3s ease;
 }
 
 .home {
@@ -162,6 +166,23 @@ nav .nav-content {
 }
 .search-btn:hover img {
     transform: scale(1.1);
+}
+
+/* Material count display */
+.material-count {
+    margin-top: 20px;
+    text-align: center;
+    color: #ffffff;
+}
+
+#materialCount {
+    font-family: "Roboto Mono", monospace;
+    font-size: 16px;
+    color: #e0e0e0;
+    background: rgba(47, 51, 58, 0.8);
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid rgba(65, 105, 225, 0.3);
 }
 
 
@@ -308,6 +329,70 @@ nav .nav-content {
     .pagectrl {
         flex-wrap: wrap;
         justify-content: center;
+    }
+}
+
+/* Navigation responsive design */
+@media screen and (max-width: 768px) {
+    nav {
+        padding: 15px 10px;
+    }
+    
+    nav .nav-content {
+        max-width: 95%;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .nav-content .nav-links {
+        gap: 2px;
+        justify-content: center;
+    }
+    
+    .nav-links li a {
+        padding: 8px 3px;
+        font-size: clamp(12px, 2vw, 18px);
+    }
+    
+    .nav-content .logo a {
+        font-size: clamp(18px, 3vw, 24px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    nav {
+        padding: 15px 5px;
+        min-height: 80px;
+    }
+    
+    nav .nav-content {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .nav-content .nav-links {
+        order: 2;
+        justify-content: center;
+        gap: 0;
+    }
+    
+    .nav-content .logo {
+        order: 1;
+    }
+    
+    .nav-links li a {
+        padding: 6px 2px;
+        font-size: clamp(10px, 1.8vw, 14px);
+    }
+    
+    .nav-content .logo a {
+        font-size: clamp(16px, 2.5vw, 20px);
+    }
+    
+    .home {
+        padding-top: 18%;
     }
 }
 /* 確保最後一行沒有邊框 */

@@ -241,6 +241,7 @@ async function fetchMaterials() {
     filteredMaterials = allMaterials;
 
     displayMaterials(filteredMaterials);
+    updateMaterialCount(filteredMaterials.length);
   } catch (error) {
     console.error("Fetch error:", error);
     displayError("Error fetching materials data: " + error.message);
@@ -333,6 +334,7 @@ function filterMaterialsWithCriteria(searchTerm, filters) {
   currentPage = 1;
   displayMaterials(filteredMaterials);
   updatePaginationControls(Math.ceil(filteredMaterials.length / itemsPerPage));
+  updateMaterialCount(filteredMaterials.length);
 }
 
 // Display materials in table
@@ -440,6 +442,14 @@ function convertToSubscript(text) {
       .map((digit) => subscriptMap[digit] || digit)
       .join("")
   );
+}
+
+// Update material count display
+function updateMaterialCount(count) {
+  const materialCountElement = document.getElementById("materialCount");
+  if (materialCountElement) {
+    materialCountElement.textContent = `${count} materials found`;
+  }
 }
 
 // Display error message
