@@ -57,7 +57,7 @@ nav .nav-content {
 }
 
 .nav-content .logo a {
-    font-size: clamp(20px, 4vw, 30px);
+    font-size: clamp(25px, 4vw, 30px);
     font-weight: 500;
     color: #f5f7fb;
     text-shadow: 1px 1px 2px #000;
@@ -432,4 +432,64 @@ td {
 
 td {
     text-align: center;
+}
+
+
+@media screen and (max-width: 768px) {
+    nav {
+        padding: 15px 10px;
+    }
+    
+    nav .nav-content {
+        max-width: 95%;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .nav-content .nav-links {
+        gap: 2px;
+        justify-content: center;
+    }
+    
+    .nav-links li a {
+        padding: 8px 3px;
+        font-size: clamp(12px, 2vw, 18px);
+    }
+    
+    .nav-content .logo a {
+        font-size: clamp(18px, 3vw, 24px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    nav {
+        padding: 15px 5px;
+        min-height: 80px;
+    }
+    
+    nav .nav-content {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .nav-content .nav-links {
+        order: 2;
+        justify-content: center;
+        gap: 0;
+    }
+    
+    .nav-content .logo {
+        order: 1;
+    }
+    
+    .nav-links li a {
+        padding: 6px 2px;
+        font-size: clamp(10px, 1.8vw, 14px);
+    }
+    
+    .nav-content .logo a {
+        font-size: clamp(16px, 2.5vw, 20px);
+    }
 }

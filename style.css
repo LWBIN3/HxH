@@ -54,7 +54,7 @@ nav .nav-content {
 }
 
 .nav-content .logo a {
-    font-size: clamp(20px, 4vw, 30px);
+    font-size: clamp(25px, 4vw, 30px);
     font-weight: 500;
     color: #f5f7fb;
     text-shadow: 1px 1px 2px #000;
