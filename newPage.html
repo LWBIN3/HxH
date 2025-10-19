@@ -30,6 +30,9 @@
         </div>
     </nav>
 
+    <!-- 觸發圖示 -->
+    <div class="stats-trigger">⚙️</div>
+    
     <!-- 選單 -->
     <div class="stats-bar">
         <!-- <div class="stat-item" data-id="overview">Overview</div> -->
@@ -38,7 +41,6 @@
         <div class="stat-item" data-id="stiffness">Stiffness tensor</div>
         <div class="stat-item" data-id="electronic">Electronic bands</div>
         <div class="stat-item" data-id="bader">Bader charges</div>
-        <div class="stat-item" data-id="optical">Optical polarizability</div>
         <div class="dropdown">
             <button class="dropdown-button">
                 <span class="button-text">Visualization</span>
@@ -61,15 +63,14 @@
     <!-- 介紹區以及視覺化區 -->
     <div class="content-area">
         <div class="material-info"></div>
-        <div class="visualization-area" id="plot">
-            <div class="toolbar">
-                <div class="direction">
-                    <button id='a'>a</button>
-                    <button id='b'>b</button>
-                    <button id='c'>c</button>
-                    <button id='a*'>a*</button>
-                    <button id='b*'>b*</button>
-                    <button id='c*'>c*</button>
+        <div class="visualization-container">
+            <div class="visualization-area" id="plot">
+                <div id="threejs-container"></div>
+            </div>
+            <div class="tooltip-container" id="tooltip-container">
+                <h3>Element Information</h3>
+                <div class="tooltip-content">
+                    <p>Hover over an atom to see details</p>
                 </div>
             </div>
         </div>

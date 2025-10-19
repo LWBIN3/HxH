@@ -112,25 +112,87 @@ document.addEventListener("DOMContentLoaded", async function () {
   const dropdownButton = dropdown.querySelector(".dropdown-button");
   const dropdownContent = dropdown.querySelector(".dropdown-content");
   const mainDropdownItems = dropdownContent.querySelectorAll(".dropdown-item");
-  const directionPanel = document.querySelector(".direction");
+  // 移除directionPanel引用
   let currentPeriodicSize = "1x1x1"; // 默認週期性大小
 
-  // 點擊按鈕時顯示/隱藏下拉選單
-  dropdownButton.addEventListener("click", (e) => {
-    dropdownContent.classList.toggle("show");
+  // 滑鼠懸停時顯示下拉選單
+  dropdownButton.addEventListener("mouseenter", (e) => {
+    dropdownContent.classList.add("show");
 
-    e.stopPropagation();
+    // 計算並設置下拉選單位置
+    const rect = dropdownButton.getBoundingClientRect();
+    dropdownContent.style.top = `${rect.bottom + 4}px`;
+    dropdownContent.style.left = `${rect.left}px`;
+    dropdownContent.style.width = `${rect.width}px`;
   });
+
+  // 滑鼠離開時隱藏下拉選單（延遲隱藏）
+  dropdownButton.addEventListener("mouseleave", (e) => {
+    setTimeout(() => {
+      if (
+        !dropdownContent.matches(":hover") &&
+        !dropdownButton.matches(":hover")
+      ) {
+        dropdownContent.classList.remove("show");
+      }
+    }, 100);
+  });
+
+  // 當滑鼠在dropdown內容上時保持顯示
+  dropdownContent.addEventListener("mouseenter", (e) => {
+    dropdownContent.classList.add("show");
+  });
+
+  dropdownContent.addEventListener("mouseleave", (e) => {
+    setTimeout(() => {
+      if (
+        !dropdownContent.matches(":hover") &&
+        !dropdownButton.matches(":hover")
+      ) {
+        dropdownContent.classList.remove("show");
+      }
+    }, 100);
+  });
+
+  // 處理 "Show" 項目的子選單懸停顯示
+  const hasSubmenu = document.querySelector(".has-submenu");
+  const submenu = document.querySelector(".submenu");
+
+  if (hasSubmenu && submenu) {
+    hasSubmenu.addEventListener("mouseenter", function () {
+      const rect = this.getBoundingClientRect();
+      submenu.style.top = `${rect.top}px`;
+      submenu.style.left = `${rect.right + 5}px`;
+      submenu.style.display = "block";
+    });
+
+    hasSubmenu.addEventListener("mouseleave", function (e) {
+      // 延遲隱藏，讓使用者有時間移動到子選單
+      setTimeout(() => {
+        if (!submenu.matches(":hover") && !hasSubmenu.matches(":hover")) {
+          submenu.style.display = "none";
+        }
+      }, 100);
+    });
+
+    submenu.addEventListener("mouseleave", function () {
+      setTimeout(() => {
+        if (!submenu.matches(":hover") && !hasSubmenu.matches(":hover")) {
+          submenu.style.display = "none";
+        }
+      }, 100);
+    });
+  }
 
   // 處理主選單項目點擊
   mainDropdownItems.forEach((item) => {
     item.addEventListener("click", async function (e) {
       const action = this.textContent.trim();
-      directionPanel.classList.add("show");
+      // 移除directionPanel操作
       //用toggle的話就是一直切換，所以如果我一直按show or hide 裡面的按鈕他就一下出現一下消失
       if (action === "Stop") {
         // 隱藏視覺化
-        directionPanel.classList.remove("show");
+        // 移除directionPanel操作
         dropdownButton.querySelector(".button-text").textContent = "Stop";
         stopRendering();
       } else if (this.classList.contains("has-submenu")) {
@@ -168,20 +230,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   });
 
-  // 點擊其他地方時關閉下拉選單
-  document.addEventListener("click", (e) => {
-    if (!dropdown.contains(e.target)) {
-      dropdownContent.classList.remove("show");
-    }
-  });
+  // 移除點擊關閉邏輯，改為hover觸發
 
-  //確認一下有沒有確實抓到按鈕的動向
-  const cameraDirection = document.querySelector(".direction");
-  cameraDirection.addEventListener("click", (e) => {
-    if (e.target.tagName === "BUTTON") {
-      console.log(e.target.id);
-    }
-  });
+  // 移除camera控制邏輯
   // 解析材料名稱並獲取原子序號
   const materialList = parseChemicalFormula(materialName);
   const atomicNumbers = materialList.map((element) => elementMap[element]);
@@ -199,7 +250,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         dropdownButton.querySelector(".button-text").textContent = "Show";
 
         // 顯示方向控制面板
-        directionPanel.classList.add("show");
+        // 移除directionPanel操作
 
         // 執行視覺化，使用 1x1 格式
         const periodicSize = currentPeriodicSize
@@ -216,11 +267,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // 初始化場景、相機和渲染器
 const scene = new THREE.Scene(); // Main scene
-const threeContainer = document.getElementById("plot");
+const threeContainer = document.getElementById("threejs-container");
 const containerWidth = threeContainer.clientWidth;
 const containerHeight = threeContainer.clientHeight;
 const aspect = containerWidth / containerHeight; // 計算寬高比
-const viewHeight = 10;
+const viewHeight = 20; // 從 10 改成 30，視角變遠 3 倍
 const viewWidth = viewHeight * aspect;
 const camera = new THREE.OrthographicCamera(
   -viewWidth / 2, // left
@@ -313,14 +364,15 @@ async function initCheck(materialName, atomicNumbers) {
     }
 
     if (!matchedData) {
-      document.getElementById("plot").innerHTML = "Nothing was found";
+      document.getElementById("threejs-container").innerHTML =
+        "Nothing was found";
       return null;
     }
 
     return matchedData; // 返回數據而不是直接初始化
   } catch (error) {
     console.error("failed to load:", error);
-    document.getElementById("plot").innerHTML = "failed to load";
+    document.getElementById("threejs-container").innerHTML = "failed to load";
     return null;
   }
 }
@@ -399,7 +451,7 @@ function initStructure(data, periodicSize) {
   } catch (error) {
     console.error("Data processing error:", error);
     console.error("Wrong data:", data);
-    document.getElementById("plot").innerHTML =
+    document.getElementById("threejs-container").innerHTML =
       "Data processing error: " + error.message;
   }
 }
@@ -506,30 +558,7 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
   createLatticeBox(cell, nx, ny);
   initializeCameraView();
 
-  // 按鈕事件監聽器，處理相機視角
-  const cameraDirection = document.querySelector(".direction");
-  cameraDirection.addEventListener("click", (e) => {
-    if (e.target.tagName === "BUTTON") {
-      const buttonId = e.target.id;
-      console.log(buttonId);
-
-      // 解析按鈕ID來確定軸向和方向
-      let axis, isReverse;
-
-      if (buttonId.endsWith("*")) {
-        // 處理 a*, b*, c* 按鈕
-        axis = buttonId.charAt(0); // 取得第一個字符 (a, b, 或 c)
-        isReverse = true;
-      } else {
-        // 處理 a, b, c 按鈕
-        axis = buttonId;
-        isReverse = false;
-      }
-
-      // 呼叫相機調整函數
-      setCameraViewAlongAxis(axis, isReverse);
-    }
-  });
+  // 移除camera按鈕控制邏輯
 }
 
 // 添加一個初始化相機位置的函數
@@ -541,9 +570,8 @@ function initializeCameraView() {
   boundingBox.getCenter(center);
   boundingBox.getSize(size);
 
-  // 計算適合的初始距離
   const maxDim = Math.max(size.x, size.y, size.z);
-  const cameraDistance = maxDim * 20;
+  const cameraDistance = maxDim * 200;
 
   camera.position.set(
     center.x + cameraDistance,
@@ -624,16 +652,9 @@ raycaster.params.Mesh.threshold = 0;
 raycaster.params.Line.threshold = 0.05; //縮小線段的使用範圍，避免一直被他擋住
 const mouse = new THREE.Vector2();
 
-// 3. 建立 tooltip DOM 元素
-const tooltip = document.createElement("div");
-tooltip.style.position = "absolute";
-tooltip.style.padding = "4px 8px";
-tooltip.style.background = "rgba(0,0,0,0.7)";
-tooltip.style.color = "white";
-tooltip.style.borderRadius = "4px";
-tooltip.style.pointerEvents = "none";
-tooltip.style.display = "none";
-document.body.appendChild(tooltip);
+// 3. 獲取 tooltip 容器
+const tooltipContainer = document.getElementById("tooltip-container");
+const tooltipContent = tooltipContainer.querySelector(".tooltip-content");
 
 // 修正滑鼠事件監聽器
 window.addEventListener("mousemove", (event) => {
@@ -652,14 +673,23 @@ window.addEventListener("mousemove", (event) => {
   if (intersects.length > 0) {
     const obj = intersects[0].object;
     if (obj.userData.element) {
-      tooltip.textContent = obj.userData.element;
-      tooltip.style.left = event.clientX + 10 + "px";
-      tooltip.style.top = event.clientY + 10 + "px";
-      tooltip.style.display = "block";
-      // obj.material.color.set(0xff0000);
+      const element = obj.userData.element;
+      const position = obj.position;
+
+      // 更新tooltip容器內容
+      tooltipContent.innerHTML = `
+  <div style="display: flex; gap: 8px; align-items: center;">
+    <span><strong>Element:</strong> ${element}</span>
+    <span>|</span>
+    <span><strong>Pos:</strong> (${position.x.toFixed(2)}, ${position.y.toFixed(
+        2
+      )}, ${position.z.toFixed(2)})</span>
+  </div>
+`;
     }
   } else {
-    tooltip.style.display = "none";
+    // 滑鼠不在任何原子上時顯示默認訊息
+    tooltipContent.innerHTML = `<p>Hover over an atom to see details</p>`;
   }
 });
 
@@ -1075,20 +1105,20 @@ function getElementSymbol(atomicNumber) {
 function setupResizeObserver() {
   const resizeObserver = new ResizeObserver((entries) => {
     for (let entry of entries) {
-      if (entry.target === container) {
+      if (entry.target === threeContainer) {
         onWindowResize();
       }
     }
   });
 
-  if (container) {
-    resizeObserver.observe(container);
+  if (threeContainer) {
+    resizeObserver.observe(threeContainer);
   }
 }
 
 function onWindowResize() {
-  const width = container.clientWidth;
-  const height = container.clientHeight;
+  const width = threeContainer.clientWidth;
+  const height = threeContainer.clientHeight;
 
   // 更新相機長寬比
   camera.aspect = width / height;
@@ -1098,4 +1128,4 @@ function onWindowResize() {
   renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
 }
-console.log("fuck");
+setupResizeObserver();

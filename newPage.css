@@ -12,8 +12,10 @@ body {
     background: #1A1C21;
     color: #fff;
     font-family: 'Roboto mono', monospace;
-    padding-top: 80px;
-    /* 增加頂部間距 */
+    padding-top: 45px;
+    padding-left: 0;                 /* 移除左邊距，因為側邊欄是固定的 */
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 ::-webkit-scrollbar {
@@ -32,6 +34,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #ffffff;
 }
+
 /* 導航欄的設置 */
 nav {
     position: fixed;
@@ -61,8 +64,8 @@ nav .nav-content {
     font-weight: 500;
     color: #f5f7fb;
     text-shadow: 1px 1px 2px #000;
-    white-space: nowrap; /*防止換行*/
-    flex-shrink: 0;/*避免被壓縮*/
+    white-space: nowrap;
+    flex-shrink: 0;
     text-decoration: none;
 }
 
@@ -89,82 +92,178 @@ nav .nav-content {
     text-decoration: none;
 }
 
+.nav-links li a:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    transform: scale(1.05);
+}
 
-
+/* 側邊欄樣式 - 可收合設計 */
 .stats-bar {
-    padding: 1rem;
+    position: fixed;
+    left: 0;
+    top: 60px;                       /* 在導航欄下方，增加一點間距 */
+    width: 60px;                     /* 收合時的寬度 */
+    height: calc(100vh - 70px);      /* 調整高度避免切到導航欄 */
+    padding: 1.5rem 0.5rem;
     background: #23252c;
-    border-radius: 0.7rem;
     display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 95%;                    /* 填滿父容器 */
-    max-width: 100rem;              /* 設定最大寬度避免過寬 */
-    margin: 0rem 2rem 0rem 2.5rem;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: stretch;
+    overflow: visible;               /* 改為完全 visible，讓下拉選單可以溢出 */
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    border-right: 2px solid rgba(65, 105, 225, 0.2);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+}
+
+.stats-bar:hover {
+    width: 220px;                    /* 展開時的寬度 */
+    padding: 1.5rem 1rem;
+}
+
+/* 移除觸發圖示 */
+.stats-trigger {
+    display: none;
 }
 
 .stat-item {
-    min-height: 2rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem 1rem;
-    border-radius: 4px;
-    font-size: 1.3rem;
+    min-height: 2.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center;          /* 收合時置中 */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    width: 100%;
+    border: 1px solid transparent;
+    overflow: hidden;
+}
+
+.stats-bar:hover .stat-item {
+    justify-content: flex-start;      /* 展開時左對齊 */
+    padding: 0.6rem 1rem;
 }
 
 .stat-item:hover {
     background: rgba(65, 105, 225, 0.3);
+    border-color: rgba(65, 105, 225, 0.5);
+    transform: translateX(5px);
 }
 
 .stat-item.active {
     background: #4169e1;
     color: white;
+    box-shadow: 0 2px 8px rgba(65, 105, 225, 0.4);
 }
 
-/* 關鍵改進：修正 content-area 的布局 */
+/* 調整 content-area 以適應側邊欄 */
 .content-area {
     display: flex;
+    align-items: stretch;
     padding: 10px;
     gap: 20px;
-    /* 添加間距 */
     min-height: 70vh;
-    /* 改為 min-height */
     flex-wrap: wrap;
+    width: calc(100% - 60px);        /* 扣除收合的側邊欄寬度 */
+    margin: 20px auto 0 60px;        /* 左邊留出側邊欄空間 */
+    max-width: calc(100rem - 60px);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 當側邊欄展開時，content-area 自動調整 */
+.stats-bar:hover ~ .content-area {
+    width: calc(100% - 220px);
+    margin-left: 220px;
+    max-width: calc(100rem - 220px);
 }
 
 /* 響應式布局改進 */
 .material-info {
-    flex: 1;
-    min-width: 350px;
-    /* 設定最小寬度 */
-    padding: 2rem;
-    font-size: larger;
-    background: rgba(255, 255, 255, 0.05);
+    flex: 0 0 auto;                  /* 固定尺寸 */
+    width: 450px;                    /* 增加寬度 */
+    min-width: 400px;
+    padding: 1rem;                   /* 恢復內邊距 */
+    font-size: 0.8rem;               /* 保持較小字體 */
+
     border-radius: 8px;
-    margin: 1rem 1rem 0rem 2rem; /* 上 右 下 左 */
-    height: 35rem;          /* 固定高度 */
-    max-height: 46rem;      /* 最大高度 */
-    min-height: 35rem;      /* 最小高度 */
-    max-width: 48rem;           /* 固定寬度（會覆蓋 flex） */
+    margin: -0.5rem 0rem 0rem 0rem;
+    height: auto;                    /* 自動高度 */
+    min-height: auto;              
+    overflow: visible;               /* 不要滾動條 */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 介紹區內的標題縮小 */
+.material-info h1 {
+    font-size: 1.4rem;               /* 主標題 */
+    margin-bottom: 0.6rem;
+}
+
+.material-info h2 {
+    font-size: 1.05rem;              /* 副標題 */
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* 視覺化容器包裝器 */
+.visualization-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 400px;
+    max-width: 50rem;
+    margin: 1rem 0rem 0rem 0rem;
+    min-height: auto;               /* 與material-info一致的總高度 */
+    height:auto;
+    gap: 0;                          /* 移除gap，使兩部分緊密連接 */
 }
 
 .visualization-area {
-    flex: 1;
-    width:100%;
-    min-width: 380px;
-    max-width: 48.5rem;
     background: #2a2d35;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 12px 12px 0 0;    /* 只有上方圓角 */
     position: relative;
-    height: 35rem;
-    margin: 1rem 2rem 0rem 1rem; /* 上 右 下 左 */
+    height: 20rem;                   /* 主要視覺化區域 (20rem) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* tooltip容器樣式 */
+.tooltip-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0 0 12px 12px;    /* 只有下方圓角 */
+    padding: 1rem;
+    height: 8rem;                    /* tooltip資訊區域 (8rem) */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-container h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #4169e1;
+    font-weight: 500;
+}
+
+.tooltip-content {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.tooltip-content p {
+    margin: 0.25rem 0;
 }
 
 #threejs-container {
@@ -181,38 +280,104 @@ nav .nav-content {
 
 /* 響應式斷點 */
 @media (max-width: 1024px) {
+    .stats-bar {
+        width: 50px;
+    }
+    
+    .stats-bar:hover {
+        width: 180px;
+    }
+    
     .content-area {
+        width: calc(100% - 50px);
+        margin-left: 50px;
         flex-direction: column;
+    }
+    
+    .stats-bar:hover ~ .content-area {
+        width: calc(100% - 180px);
+        margin-left: 180px;
     }
 
     .material-info,
     .visualization-area {
+        width: 100%;
         min-width: 100%;
         flex: none;
+    }
+    
+    .maincontent {
+        width: calc(100% - 50px);
+        margin-left: 50px;
+    }
+    
+    .stats-bar:hover ~ .maincontent {
+        width: calc(100% - 180px);
+        margin-left: 180px;
     }
 }
 
 @media (max-width: 768px) {
+    /* 在小螢幕上隱藏側邊欄，改回懸浮模式 */
+    .stats-bar {
+        width: 200px;
+        left: -200px;
+        top: 30vh;
+        height: auto;
+        max-height: 70vh;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stats-bar:hover {
+        left: 0;
+        width: 200px;
+    }
+    
+    .content-area {
+        width: calc(100% - 3rem);
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* 移除 hover 時的調整，因為是懸浮模式 */
+    .stats-bar:hover ~ .content-area {
+        width: calc(100% - 3rem);
+        margin-left: auto;
+    }
+    
     .material-info {
+        width: 100%;
         min-width: 100%;
         padding: 1rem;
     }
 
     .visualization-area {
+        width: 100%;
         min-width: 100%;
         min-height: 400px;
+    }
+    
+    .maincontent {
+        width: calc(100% - 3rem);
+        margin-left: auto;
+    }
+    
+    .stats-bar:hover ~ .maincontent {
+        width: calc(100% - 3rem);
+        margin-left: auto;
     }
 }
 
 .info-table {
     border-collapse: collapse;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
 }
 
 .info-table td {
     border: 1px solid #ccc;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.6rem;
     background-color: #5559c7;
 }
 
@@ -224,8 +389,15 @@ nav .nav-content {
 
 /* 修正 material-details 的布局 */
 .maincontent {
-    width: 100%;
+    width: calc(100% - 60px);        /* 扣除收合的側邊欄寬度 */
+    margin-left: 60px;               /* 左邊留出側邊欄空間 */
     padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-bar:hover ~ .maincontent {
+    width: calc(100% - 220px);
+    margin-left: 220px;
 }
 
 .material-details {
@@ -236,7 +408,6 @@ nav .nav-content {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     min-width: 350px;
-    margin-left:0.5rem;
 }
 
 .tab-content {
@@ -251,39 +422,56 @@ nav .nav-content {
 /* 下拉選單相關樣式 */
 .dropdown {
     position: relative;
-    width: 200px;
+    width: 100%;
+    z-index: 1001;
 }
 
 .dropdown-button {
     width: 100%;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 4px;
+    padding: 0.6rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid transparent;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;          /* 收合時置中 */
     align-items: center;
     color: white;
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 1.3rem;
+    font-family: 'Roboto mono',monospace;
+    font-size: 0.95rem;
+    min-height: 2.5rem;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.stats-bar:hover .dropdown-button {
+    justify-content: space-between;   /* 展開時兩端對齊 */
+    padding: 0.6rem 1rem;
+}
+
+.dropdown-button .button-text {
+    display: none;                    /* 收合時隱藏文字 */
+}
+
+.stats-bar:hover .dropdown-button .button-text {
+    display: inline;                  /* 展開時顯示文字 */
 }
 
 .dropdown-button:hover {
     background: rgba(65, 105, 225, 0.3);
+    border-color: rgba(65, 105, 225, 0.5);
+    transform: translateX(5px);
 }
 
 .dropdown-content {
     display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
+    position: fixed;                 /* 改為 fixed 定位，完全脫離容器限制 */
     background: #2a2d35;
     border-radius: 4px;
     margin-top: 4px;
-    z-index: 1000;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 3000;                   /* 大幅提高層級 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 180px;                /* 設定最小寬度 */
 }
 
 .dropdown-content.show {
@@ -291,10 +479,10 @@ nav .nav-content {
 }
 
 .dropdown-item {
-    padding: 10px;
+    padding: 12px 16px;
     cursor: pointer;
     color: white;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     transition: background-color 0.2s;
 }
 
@@ -304,13 +492,21 @@ nav .nav-content {
 
 .submenu {
     display: none;
-    position: absolute;
-    left: 100%;
-    top: 0;
-    width: 65px;
+    position: fixed;                 /* 改為 fixed 定位 */
     background: #2a2d35;
     border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: 3001;                   /* 子選單層級更高 */
+    min-width: 80px;
+}
+
+.has-submenu:hover .submenu {
+    display: block;
+}
+
+/* 當滑鼠在子選單上時保持顯示 */
+.submenu:hover {
+    display: block;
 }
 
 .has-submenu {
@@ -338,67 +534,6 @@ nav .nav-content {
 
 .arrow.up {
     transform: rotate(-135deg);
-}
-
-.toolbar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.direction {
-    position: absolute;
-    left: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.direction.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.direction button {
-    width: 3rem;
-    height: 3rem;
-    border: none;
-    background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #e0e0e0;
-    transition: all 0.3s ease;
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.direction button:hover {
-    background: linear-gradient(145deg, #3a3a3a, #252525);
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 0 15px rgba(100, 149, 237, 0.2);
-    color: #ffffff;
-}
-
-.direction button:active {
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.4),
-        inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.direction button:focus {
-    outline: none;
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 0 0 2px rgba(100, 149, 237, 0.5);
 }
 
 thead,
@@ -434,7 +569,7 @@ td {
     text-align: center;
 }
 
-
+/* 手機版導航欄響應式 */
 @media screen and (max-width: 768px) {
     nav {
         padding: 15px 10px;
@@ -458,6 +593,11 @@ td {
     
     .nav-content .logo a {
         font-size: clamp(18px, 3vw, 24px);
+    }
+    
+    .maincontent {
+        width: calc(100% - 3rem);
+        margin-left: auto;
     }
 }
 
