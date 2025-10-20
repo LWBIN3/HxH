@@ -2,21 +2,23 @@ document.addEventListener("DOMContentLoaded", async function () {
   // 解析原本主要頁面傳來的資訊，包含材料名稱name以及材料的其他數據data
   const params = new URLSearchParams(window.location.search);
   const materialName = params.get("name");
-  const materialData = params.get("data")
-    ? JSON.parse(decodeURIComponent(params.get("data")))
+  const materialDataRaw = params.get("data");
+  const materialData = materialDataRaw
+    ? JSON.parse(decodeURIComponent(materialDataRaw))
     : null;
+  console.log(materialName, materialData);
   // Overview的部份
   if (materialName && materialData) {
     document.querySelector(".material-info").innerHTML = `
       <h1>${materialName}</h1>
       <h2>Structure info:</h2>
       <table class="info-table">
-        <tr><td>Layer group</td><td>${materialData.layerGroup}</td></tr>
-        <tr><td>Layer group number</td><td>${
-          materialData.lgnum || "N/A"
+        <tr><td>Point group</td><td>${materialData.pointGroup}</td></tr>
+        <tr><td>Layer group </td><td>${
+          materialData.layerGroup || "N/A"
         }</td></tr>
-        <tr><td>Structure origin</td><td>${
-          materialData.label || "N/A"
+        <tr><td>Space group</td><td>${
+          materialData.spaceGroup || "N/A"
         }</td></tr>
       </table>
       <h2>Stability:</h2>
@@ -216,7 +218,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       startRendering();
       // 獲取材料數據並顯示視覺化
       if (materialName && atomicNumbers) {
+        console.log(
+          `show me name ${materialName} and numbers ${atomicNumbers}`
+        );
         const structureData = await initCheck(materialName, atomicNumbers);
+
         if (structureData) {
           // 將 1*1*1 格式轉換為 1x1 格式
           const periodicSize = currentPeriodicSize
@@ -234,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // 移除camera控制邏輯
   // 解析材料名稱並獲取原子序號
-  const materialList = parseChemicalFormula(materialName);
+  const materialList = materialData.material2d;
   console.log(materialList);
   const atomicNumbers = materialList.map((element) => elementMap[element]);
   console.log(atomicNumbers);
@@ -351,11 +357,9 @@ async function initCheck(materialName, atomicNumbers) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const apiData = await response.json();
-    console.log(atomicNumbers);
     let matchedData = null;
     for (const item of apiData) {
       const entryNumbers = item.numbers;
-      console.log(entryNumbers);
 
       if (
         Array.isArray(entryNumbers) &&
