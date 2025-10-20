@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       <h1>${materialName}</h1>
       <h2>Structure info:</h2>
       <table class="info-table">
-        <tr><td>Layer group</td><td>${materialData.layergroup}</td></tr>
+        <tr><td>Layer group</td><td>${materialData.layerGroup}</td></tr>
         <tr><td>Layer group number</td><td>${
           materialData.lgnum || "N/A"
         }</td></tr>
@@ -235,7 +235,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   // 移除camera控制邏輯
   // 解析材料名稱並獲取原子序號
   const materialList = parseChemicalFormula(materialName);
+  console.log(materialList);
   const atomicNumbers = materialList.map((element) => elementMap[element]);
+  console.log(atomicNumbers);
 
   // 初始化時嘗試獲取並顯示結構，並自動啟動視覺化
   if (materialList.length > 0) {
@@ -349,15 +351,17 @@ async function initCheck(materialName, atomicNumbers) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const apiData = await response.json();
-
+    console.log(atomicNumbers);
     let matchedData = null;
     for (const item of apiData) {
-      const entryNumbers = item["1"].numbers;
+      const entryNumbers = item.numbers;
+      console.log(entryNumbers);
+
       if (
         Array.isArray(entryNumbers) &&
         areArraysEquivalent(entryNumbers, atomicNumbers)
       ) {
-        matchedData = item["1"];
+        matchedData = item.numbers;
         // console.log("Match found：", entryNumbers, atomicNumbers);
         break;
       }

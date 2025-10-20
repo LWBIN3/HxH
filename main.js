@@ -355,19 +355,15 @@ function displayMaterials(materials) {
 
   pageItems.forEach((material) => {
     const row = document.createElement("tr");
-    const formula = convertToSubscript(
-      material.folder.split("/").pop().split("-")[0]
-    );
+    const formula = material.fullName;
 
     row.innerHTML = `
             <td>${formula}</td>
-            <td>${material.ehull ? material.ehull.toFixed(3) : "-"}</td>
-            <td>${material.hform ? material.hform.toFixed(3) : "-"}</td>
-            <td>${
-              material.gap !== undefined ? material.gap.toFixed(3) : "-"
-            }</td>
-            <td>${material.magstate || "-"}</td>
-            <td>${material.layergroup || "-"}</td>
+            <td>${material.bindingEnergy ? material.ehull.toFixed(3) : "-"}</td>
+            <td>${material.polaritySource || "-"}</td>
+            <td>${material.crystalSystem || "-"}</td>
+            <td>${material.layerGroup || "-"}</td>
+            <td>${material.crystalPlane || "-"}</td>
         `;
 
     row.onclick = () => loadPage(formula);
@@ -406,11 +402,7 @@ function updatePaginationControls(totalPages) {
 
 // Load detail page for selected material
 function loadPage(materialName) {
-  const material = allMaterials.find(
-    (m) =>
-      convertToSubscript(m.folder.split("/").pop().split("-")[0]) ===
-      materialName
-  );
+  const material = allMaterials.find((m) => m.fullName === materialName);
 
   const params = new URLSearchParams({
     name: materialName,

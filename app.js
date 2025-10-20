@@ -33,7 +33,7 @@ app.get("/api/material", async (req, res) => {
     }
 
     const database = client.db("material");
-    const materials = database.collection("testing");
+    const materials = database.collection("result");
 
     const result = await materials.find({}).toArray();
     // console.log(`Found ${result.length} documents`);
@@ -56,7 +56,7 @@ app.get("/api/infovisualize", async (req, res) => {
     }
 
     const database = client.db("material");
-    const infoCollection = database.collection("infovisualize");
+    const infoCollection = database.collection("visual");
 
     const result = await infoCollection.find({}).toArray();
     // console.log(`Found ${result.length} documents in infovisualize collection`);
