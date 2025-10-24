@@ -232,7 +232,6 @@ nav .nav-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px 12px 0 0;    /* 只有上方圓角 */
     position: relative;
     height: 20rem;                   /* 主要視覺化區域 (20rem) */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);

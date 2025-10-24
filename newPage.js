@@ -217,11 +217,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       dropdownButton.querySelector(".button-text").textContent = "Show";
       startRendering();
       // 獲取材料數據並顯示視覺化
-      if (materialName && atomicNumbers) {
-        console.log(
-          `show me name ${materialName} and numbers ${atomicNumbers}`
-        );
-        const structureData = await initCheck(materialName, atomicNumbers);
+      if (materialName) {
+        const structureData = await initCheck(materialName);
 
         if (structureData) {
           // 將 1*1*1 格式轉換為 1x1 格式
@@ -240,15 +237,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // 移除camera控制邏輯
   // 解析材料名稱並獲取原子序號
-  const materialList = materialData.material2d;
-  console.log(materialList);
-  const atomicNumbers = materialList.map((element) => elementMap[element]);
-  console.log(atomicNumbers);
+  const materialList = materialData.fullName;
+  // const atomicNumbers = materialList.map((element) => elementMap[element]);
+  // console.log(atomicNumbers);
 
   // 初始化時嘗試獲取並顯示結構，並自動啟動視覺化
   if (materialList.length > 0) {
     try {
-      const structureData = await initCheck(materialName, atomicNumbers);
+      const structureData = await initCheck(materialList);
       if (structureData) {
         // 自動執行 1x1 視覺化
         currentPeriodicSize = "1x1x1";
@@ -350,7 +346,7 @@ const moleculeGroup = new THREE.Group();
 scene.add(moleculeGroup); // 將組添加到主場景中
 
 // 開始處理材料視覺化
-async function initCheck(materialName, atomicNumbers) {
+async function initCheck(materialName) {
   try {
     const response = await fetch("/api/infovisualize");
     if (!response.ok) {
@@ -359,14 +355,11 @@ async function initCheck(materialName, atomicNumbers) {
     const apiData = await response.json();
     let matchedData = null;
     for (const item of apiData) {
-      const entryNumbers = item.numbers;
+      const visual = item.fullName;
 
-      if (
-        Array.isArray(entryNumbers) &&
-        areArraysEquivalent(entryNumbers, atomicNumbers)
-      ) {
-        matchedData = item.numbers;
-        // console.log("Match found：", entryNumbers, atomicNumbers);
+      if (visual === materialName) {
+        matchedData = item.structure;
+        console.log(`Match found：${matchedData}`);
         break;
       }
     }
@@ -417,8 +410,6 @@ function areArraysEquivalent(arr1, arr2) {
 function initStructure(data, periodicSize) {
   try {
     // 檢查數據格式
-    // console.log("Received data:", data);
-
     // 適應不同的數據格式
     const cellData = Array.isArray(data.cell)
       ? data.cell.flat()
@@ -443,17 +434,28 @@ function initStructure(data, periodicSize) {
     const atoms = [];
     for (let i = 0; i < positions.length; i++) {
       atoms.push({
-        x: positions[i][0],
-        y: positions[i][1],
-        z: positions[i][2],
+        x:
+          positions[i][0] * cell[0][0] +
+          positions[i][1] * cell[1][0] +
+          positions[i][2] * cell[2][0],
+        y:
+          positions[i][0] * cell[0][1] +
+          positions[i][1] * cell[1][1] +
+          positions[i][2] * cell[2][1],
+        z:
+          positions[i][0] * cell[0][2] +
+          positions[i][1] * cell[1][2] +
+          positions[i][2] * cell[2][2],
         element: getElementSymbol(numbers[i]),
       });
     }
 
-    // console.log("Processed data:", {
-    //   cell: cell,
-    //   atoms: atoms,
-    // });
+    console.log("Processed data:", {
+      cell: cell,
+      atoms: atoms,
+      positions: positions,
+      numbers: numbers,
+    });
 
     createStructureVisualization(atoms, cell, periodicSize);
   } catch (error) {
@@ -534,7 +536,6 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
       });
     }
   }
-  // console.log(expandedAtoms);
   expandedAtoms.forEach((atom) => {
     const skinColor = getAtomColor(atom.element);
     const sphereMaterial = new THREE.MeshPhongMaterial({
@@ -578,13 +579,13 @@ function initializeCameraView() {
   boundingBox.getCenter(center);
   boundingBox.getSize(size);
 
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const cameraDistance = maxDim * 200;
-
+  const xyMaxDim = Math.max(size.x, size.y);
+  const maxDim = Math.max(xyMaxDim, size.z * 0.3);
+  const cameraDistance = maxDim * 3;
   camera.position.set(
-    center.x + cameraDistance,
-    center.y + cameraDistance,
-    center.z + cameraDistance
+    center.x + cameraDistance * 0.8,
+    center.y + cameraDistance * 0.8,
+    center.z + cameraDistance * 1.2
   );
 
   camera.lookAt(center);
