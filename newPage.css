@@ -16,6 +16,7 @@ body {
     padding-left: 0;                 /* 移除左邊距，因為側邊欄是固定的 */
     overflow-x: hidden;
     overflow-y: auto;
+    transform-origin: center;
 }
 
 ::-webkit-scrollbar {
@@ -177,6 +178,7 @@ nav .nav-content {
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                 margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
                 max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center center;  /* 讓主要內容區以中心為原點縮放 */
 }
 
 /* 當側邊欄展開時，content-area 自動調整 */
@@ -188,7 +190,7 @@ nav .nav-content {
 
 /* 響應式布局改進 */
 .material-info {
-    flex: 0 0 auto;                  /* 固定尺寸 */
+    flex: 0 1 36%;                  /* 固定尺寸 */
     width: 450px;                    /* 增加寬度 */
     min-width: 400px;
     padding: 1rem;                   /* 恢復內邊距 */
@@ -200,6 +202,7 @@ nav .nav-content {
     min-height: auto;              
     overflow: visible;               /* 不要滾動條 */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left:auto;
 }
 
 /* 介紹區內的標題縮小 */
@@ -216,14 +219,16 @@ nav .nav-content {
 
 /* 視覺化容器包裝器 */
 .visualization-container {
-    flex: 1;
+    flex:1 1 50%;
     display: flex;
     flex-direction: column;
     min-width: 400px;
-    max-width: 50rem;
+    max-width: 45rem;
     margin: 1rem 0rem 0rem 0rem;
     min-height: auto;               /* 與material-info一致的總高度 */
     height:auto;
+    margin-left:4rem;
+    margin-right:auto;
     gap: 0;                          /* 移除gap，使兩部分緊密連接 */
 }
 
@@ -291,6 +296,8 @@ nav .nav-content {
         width: calc(100% - 50px);
         margin-left: 50px;
         flex-direction: column;
+        max-width: width 1400px;
+        margin: 20px auto 0 60px;
     }
     
     .stats-bar:hover ~ .content-area {
@@ -392,6 +399,7 @@ nav .nav-content {
     margin-left: 60px;               /* 左邊留出側邊欄空間 */
     padding: 2rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center center;  /* 讓主要內容區以中心為原點縮放 */
 }
 
 .stats-bar:hover ~ .maincontent {

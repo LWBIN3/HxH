@@ -612,7 +612,7 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
   const cameraDistance = maxDim * 10;
 
   let offsetFromCenter;
-  let upDirection; // 🔥fire! 新增：定義上方向
+  let upDirection;
 
   switch (axis) {
     case "a":
@@ -646,13 +646,13 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
 
   // 設定相機
   camera.position.copy(center).add(offsetFromCenter);
-  camera.up.copy(upDirection); // 🔥 關鍵：設置上方向
+  camera.up.copy(upDirection);
   camera.lookAt(center);
   camera.updateProjectionMatrix();
 
   // 更新 TrackballControls
   controls.target.copy(center);
-  controls.update(); // 🔥
+  controls.update();
 }
 
 // 2. 建立 Raycaster + mouse
