@@ -322,7 +322,9 @@ function displayMaterials(materials) {
 
     row.innerHTML = `
             <td>${formula}</td>
-            <td>${material.bindingEnergy ? material.ehull.toFixed(3) : "-"}</td>
+            <td>${
+              material.bindingEnergy ? material.bindingEnergy.toFixed(3) : "-"
+            }</td>
             <td>${material.polaritySource || "-"}</td>
             <td>${material.crystalSystem || "-"}</td>
             <td>${material.layerGroup || "-"}</td>
