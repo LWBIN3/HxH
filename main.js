@@ -4,15 +4,11 @@ let filteredMaterials = [];
 let currentPage = 1;
 let itemsPerPage = 15;
 let tempFilters = {
-  species: "-",
-  stoichiometry: "",
-  magnetic: "-",
-  dynamicStability: "-",
+  crystalSystem: "-",
+  crystalPlane: "",
+  polarity: "-",
   energyMin: "",
   energyMax: "",
-  bandgapMin: "",
-  bandgapMax: "",
-  // calcMethod: "gap",
 };
 
 // Initialize when DOM is loaded
@@ -27,62 +23,41 @@ document.addEventListener("DOMContentLoaded", function () {
               </div>
               <div class="select-group">
                   <div class="select-item">
-                      <label for="species">Number of chemical species:</label>
-                      <select id="numbers" class="numbers">
+                      <label for="crystal-system">Crystal System:</label>
+                      <select id="crystal-system" class="filter-select">
                           <option value="-">-</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                          <option value="6">6</option>
-                          <option value="7">7</option>
-                          <option value="8">8</option>
-                          <option value="9">9</option>
+                          <option value="triclinic">Triclinic</option>
+                          <option value="monoclinic">Monoclinic</option>
+                          <option value="orthorhombic">Orthorhombic</option>
+                          <option value="tetragonal">Tetragonal</option>
+                          <option value="hexagonal">Hexagonal</option>
+                          <option value="cubic">Cubic</option>
                       </select>
                   </div>
                   <div class="select-item">
-                      <label for="search">Stoichiometry:</label>
-                      <input type="search" id="stoich-search" data-stoich>
+                      <label for="crystal-plane-search">Crystal Plane</label>
+                      <input type="search" id="crystal-plane-search" class="filter-input" data-crystal-plane>
                   </div>
+
                   <div class="select-item">
-                      <label for="magnetic">Magnetic:</label>
-                      <select id="magstate" class="magnetic">
+                      <label for="polarity-select">Polarity</label>
+                      <select id="polarity-select" class="filter-select">
                           <option value="-">-</option>
-                          <option value="FM">yes</option>
-                          <option value="NM">no</option>
+                          <option value="direct">yes</option>
+                          <option value="">no</option>
                       </select>
                   </div>
                   <div class="select-item">
-                      <label for="dynamic">Dynamically stable:</label>
-                      <select id="dyn_stab">
-                          <option value="-">-</option>
-                          <option value="Yes">yes</option>
-                          <option value="No">no</option>
-                          <option value="Unknown">unknown</option>
-                      </select>
-                  </div>
-                  <div class="select-item">
-                      <label for="energy">Energy above convex hull [eV/atom]:</label>
+                      <label for="binding-energy">Binding Energy [meV/Å²]:</label>
                       <div class="range-input">
                           <div class="range-input-a">
-                              <input type="number" id="min-energy" name="min-energy" step="0.1" placeholder="0.0" class="short-input">
+                              <input type="number" id="binding-energy-min" name="binding-energy-min" step="0.1" placeholder="0.0" class="filter-input-number">
                               <span>-</span>
-                              <input type="number" id="max-energy" name="max-energy" step="0.1" placeholder="4.0" class="short-input">
+                              <input type="number" id="binding-energy-max" name="binding-energy-max" step="0.1" placeholder="4.0" class="filter-input-number">
                           </div>
                       </div>
                   </div>
-                  <div class="select-item">
-                      <label for="energy">Band gap range [eV]:</label>
-                      <div class="range-input">
-                          <div class="range-input-b">
-                              <input type="number" id="min-bandgap" step="0.1" step="0.1" placeholder="0.0" class="s-input">
-                              <span>-</span>
-                              <input type="number" id="max-bandgap" step="0.1"  step="0.1" placeholder="4.0"class="s-input">
 
-                          </div>
-                      </div>
-                  </div>
                   <div class='button-group'>
                       <button id="clearButton">clear</button>
                       <button id="goButton">check</button>
@@ -125,16 +100,21 @@ document.addEventListener("DOMContentLoaded", function () {
   goButton.addEventListener("click", function () {
     // 收集所有篩選條件到暫存物件
     tempFilters = {
-      species: document.getElementById("numbers").value,
-      stoichiometry: document.getElementById("stoich-search").value,
-      magnetic: document.getElementById("magstate").value,
-      dynamicStability: document.getElementById("dyn_stab").value,
-      energyMin: document.getElementById("min-energy").value,
-      energyMax: document.getElementById("max-energy").value,
-      bandgapMin: document.getElementById("min-bandgap").value,
-      bandgapMax: document.getElementById("max-bandgap").value,
-      // calcMethod: document.getElementById("calcmethod").value,
+      crystalSystem: document.getElementById("crystal-system").value,
+      crystalPlane: document.getElementById("crystal-plane-search").value,
+      polarity: document.getElementById("polarity-select").value,
+      energyMin: document.getElementById("binding-energy-min").value,
+      energyMax: document.getElementById("binding-energy-max").value,
     };
+
+    // 執行篩選搜尋
+    const searchInput2D = document.getElementById("2D");
+    const searchInputSlab = document.getElementById("Slab");
+    const searchTerm2D = searchInput2D ? searchInput2D.value.toLowerCase() : "";
+    const searchTermSlab = searchInputSlab
+      ? searchInputSlab.value.toLowerCase()
+      : "";
+    filterMaterialsWithCriteria(searchTerm2D, searchTermSlab, tempFilters);
 
     // 關閉模態視窗
     closeModal();
@@ -147,15 +127,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 重置暫存的過濾條件
     tempFilters = {
-      species: "-",
-      stoichiometry: "",
-      magnetic: "-",
-      dynamicStability: "-",
+      crystalSystem: "-",
+      crystalPlane: "",
+      polarity: "-",
       energyMin: "",
       energyMax: "",
-      bandgapMin: "",
-      bandgapMax: "",
-      calcMethod: "gap",
     };
   });
 
@@ -167,24 +143,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Setup search handlers
 function setupSearchHandlers() {
-  const searchInput = document.querySelector(".search-input");
+  const searchInput2D = document.getElementById("2D");
+  const searchInputSlab = document.getElementById("Slab");
+
   const searchBtn = document.getElementById("search");
 
   // 添加輸入框的 keypress 事件處理
-  searchInput.addEventListener("keypress", function (e) {
+  searchInput2D.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
       e.preventDefault(); // 防止表單提交
       // 直接執行搜尋
-      const searchTerm = searchInput.value.toLowerCase();
-      filterMaterialsWithCriteria(searchTerm, tempFilters);
+      const searchTerm2D = searchInput2D.value.toLowerCase();
+      const searchTermSlab = searchInputSlab.value.toLowerCase();
+      filterMaterialsWithCriteria(searchTerm2D, searchTermSlab, tempFilters);
+    }
+  });
+  searchInputSlab.addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault(); // 防止表單提交
+      // 直接執行搜尋
+      const searchTerm2D = searchInput2D.value.toLowerCase();
+      const searchTermSlab = searchInputSlab.value.toLowerCase();
+      filterMaterialsWithCriteria(searchTerm2D, searchTermSlab, tempFilters);
     }
   });
 
   // 搜尋按鈕點擊事件
   searchBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    const searchTerm = searchInput.value.toLowerCase();
-    filterMaterialsWithCriteria(searchTerm, tempFilters);
+    const searchTerm2D = searchInput2D.value.toLowerCase();
+    const searchTermSlab = searchInputSlab.value.toLowerCase();
+    filterMaterialsWithCriteria(searchTerm2D, searchTermSlab, tempFilters);
   });
 }
 
@@ -219,15 +208,11 @@ function setupPaginationControls() {
 
 // 清除所有的 filters
 function clearAllFilters() {
-  document.querySelector("[data-stoich]").value = "";
-  document.getElementById("numbers").value = "-";
-  document.getElementById("magstate").value = "-";
-  document.getElementById("dyn_stab").value = "-";
-  // document.getElementById("calcmethod").value = "gap"; //預設讓它顯示pbe的
-  document.getElementById("min-energy").value = "";
-  document.getElementById("max-energy").value = "";
-  document.getElementById("min-bandgap").value = "";
-  document.getElementById("max-bandgap").value = "";
+  document.querySelector("[data-crystal-plane]").value = "";
+  document.getElementById("crystal-system").value = "-";
+  document.getElementById("polarity-select").value = "-";
+  document.getElementById("binding-energy-min").value = "";
+  document.getElementById("binding-energy-max").value = "";
 }
 
 // 去api抓材料
@@ -249,81 +234,59 @@ async function fetchMaterials() {
 }
 
 // 根據使用者所給的條件進行篩選
-function filterMaterialsWithCriteria(searchTerm, filters) {
+function filterMaterialsWithCriteria(searchTerm2D, searchTermSlab, filters) {
   filteredMaterials = allMaterials.filter((material) => {
-    const formula = material.olduid.split("-")[0].toLowerCase();
-    const stoich = material.folder.split("/")[6];
+    const formula = material;
+    const fullNameParts = formula.fullName.split("-");
+    const planeName = fullNameParts[0] || "";
+    const slabName = fullNameParts[1] || "";
 
-    if (searchTerm && !formula.includes(searchTerm)) {
+    // 只在有搜尋條件且搜尋條件不為null時才檢查
+    // 如果不符合條件就return false
+    if (
+      searchTerm2D &&
+      searchTerm2D.trim() !== "" &&
+      !planeName.toLowerCase().includes(searchTerm2D)
+    ) {
+      return false;
+    }
+    if (
+      searchTermSlab &&
+      searchTermSlab.trim() !== "" &&
+      !slabName.toLowerCase().includes(searchTermSlab)
+    ) {
       return false;
     }
 
-    if (filters.species !== "-") {
-      // const speciesCount = formula.match(/[A-Z]/g)?.length || 0;
-      const speciesCount = stoich.length;
-      if (parseInt(filters.species) !== speciesCount) {
+    if (filters.crystalSystem !== "-") {
+      const crystalSystem = material.crystalSystem || "";
+      if (filters.crystalSystem !== crystalSystem) {
         return false;
       }
     }
 
-    if (filters.stoichiometry) {
-      if (filters.stoichiometry !== stoich) {
+    if (filters.crystalPlane && filters.crystalPlane.trim() !== "") {
+      const crystalPlane = material.crystalPlane || "";
+      if (
+        !crystalPlane.toLowerCase().includes(filters.crystalPlane.toLowerCase())
+      ) {
         return false;
       }
     }
 
-    if (filters.magnetic !== "-") {
-      if (material.magstate !== filters.magnetic) {
-        return false;
-      }
-    }
-
-    if (filters.dynamicStability !== "-") {
-      if (material.dyn_stab !== filters.dynamicStability) {
+    if (filters.polarity !== "-") {
+      if (material.polaritySource !== filters.polarity) {
         return false;
       }
     }
 
     if (filters.energyMin !== "") {
-      if (material.ehull < parseFloat(filters.energyMin)) {
+      if (material.bindingEnergy < parseFloat(filters.energyMin)) {
         return false;
       }
     }
     if (filters.energyMax !== "") {
-      if (material.ehull > parseFloat(filters.energyMax)) {
-        return false;
-      }
-    }
-
-    // const bandgap =
-    //   filters.calcMethod === "gap"
-    //     ? material.gap
-    //     : filters.calcMethod === "gap_hse"
-    //     ? material.gap_hse
-    //     : material.gap_gw;
-
-    // let bandgap;
-    // if (filters.calcMethod === "gap") {
-    //   bandgap = material.gap;
-    // } else if (filters.calcMethod === "gap_hse") {
-    //   bandgap = material.gap_hse;
-    // } else {
-    //   bandgap = material.gap_gw;
-    // }
-
-    if (filters.bandgapMin !== "") {
-      if (
-        material.gap < parseFloat(filters.bandgapMin) ||
-        material.gap == null //這裡important，gap如果沒有的話網頁也會顯示，所以要寫這行
-      ) {
-        return false;
-      }
-    }
-    if (filters.bandgapMax !== "") {
-      if (
-        material.gap > parseFloat(filters.bandgapMax) ||
-        material.gap == null
-      ) {
+      if (material.bindingEnergy > parseFloat(filters.energyMax)) {
         return false;
       }
     }
@@ -451,18 +414,3 @@ function displayError(message) {
     materialList.innerHTML = `<tr><td colspan="6">${message}</td></tr>`;
   }
 }
-
-// 確保模態視窗在其他 JavaScript 載入後初始化
-document.addEventListener("DOMContentLoaded", function () {
-  // 這裡的程式碼會在所有 HTML 元素完全載入後執行
-  const filterButton = document.getElementById("filter");
-  if (filterButton) {
-    filterButton.addEventListener("click", function (e) {
-      e.preventDefault();
-      const modal = document.getElementById("filterModal");
-      if (modal) {
-        modal.style.display = "block";
-      }
-    });
-  }
-});

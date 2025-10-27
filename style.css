@@ -458,11 +458,21 @@ nav .nav-content {
 }
 
 .select-item input[type="search"],
-.select-item select {
+.select-item select,
+.filter-input,
+.filter-select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     width: 100%;
+}
+
+.filter-input-number {
+    width: 80px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .range-input {
