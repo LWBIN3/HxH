@@ -18,23 +18,11 @@ body {
     overflow-y: auto;
     transform-origin: center;
 }
-
-::-webkit-scrollbar {
-    width: 10px;
+/* 啟動平滑滾動效果 */
+html{
+    scroll-behavior:smooth;
 }
 
-::-webkit-scrollbar-track {
-    background: #1A1C21;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #76809e;
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #ffffff;
-}
 
 /* 導航欄的設置 */
 nav {

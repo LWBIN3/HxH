@@ -54,28 +54,164 @@ document.addEventListener("DOMContentLoaded", async function () {
   // 定義不同標籤對應的內容
   const contentMap = {
     crystal: {
+      id: "crystal",
       title: "Symmetries",
-      description: "abcdefgh",
+      description: `
+        <h3>Crystal Structure Analysis</h3>
+        <p>This section provides detailed information about the crystal structure and symmetry properties of the material.</p>
+        
+        <h4>Space Group Information</h4>
+        <p>The space group determines the arrangement of atoms in the crystal lattice. It provides information about the translational and rotational symmetries present in the structure.</p>
+        
+        <h4>Point Group</h4>
+        <p>The point group describes the symmetry operations that leave at least one point unchanged. This is crucial for understanding the material's optical and electronic properties.</p>
+        
+        <h4>Layer Group Analysis</h4>
+        <p>For 2D materials, the layer group is particularly important as it describes the symmetry within the plane of the material.</p>
+        
+        <h4>Structural Parameters</h4>
+        <p>Key structural parameters include lattice constants, bond lengths, and bond angles. These parameters determine many of the material's physical properties.</p>
+        
+        <h4>Crystallographic Directions</h4>
+        <p>Understanding the high-symmetry directions and planes is essential for predicting material behavior under different conditions.</p>
+        
+        <div style="height: 200px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
+          <p><strong>Crystal Structure Visualization</strong></p>
+          <p>Interactive 3D model showing the atomic arrangement and symmetry elements.</p>
+        </div>
+      `,
     },
     stability: {
+      id: "stability",
       title: "Stability",
-      description: "abcdefg",
+      description: `
+        <h3>Thermodynamic and Dynamic Stability</h3>
+        
+      `,
     },
     stiffness: {
+      id: "stiffness",
       title: "Stiffness Tensor",
-      description: "abcdef",
+      description: `
+        <h3>Elastic Properties and Stiffness Tensor</h3>
+        <p>The elastic properties describe how the material responds to mechanical stress and strain.</p>
+        
+        <h4>Elastic Constants</h4>
+        <p>The elastic tensor contains all information about the material's mechanical response under small deformations.</p>
+        
+        <h4>Young's Modulus</h4>
+        <p>Young's modulus describes the material's stiffness in tension or compression along specific directions.</p>
+        
+        <h4>Bulk Modulus</h4>
+        <p>The bulk modulus indicates the material's resistance to uniform compression.</p>
+        
+        <h4>Shear Modulus</h4>
+        <p>The shear modulus describes the material's resistance to shear deformation.</p>
+        
+        <h4>Poisson's Ratio</h4>
+        <p>Poisson's ratio relates lateral strain to axial strain when the material is stretched or compressed.</p>
+        
+        <h4>Anisotropy</h4>
+        <p>Analysis of directional dependence of elastic properties is crucial for understanding material behavior.</p>
+        
+        <div style="height: 180px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
+          <p><strong>Elastic Tensor Visualization</strong></p>
+          <p>3D representation of elastic properties showing directional dependence.</p>
+        </div>
+      `,
     },
     electronic: {
+      id: "electronic",
       title: "Electronic Bands",
-      description: "abcde",
+      description: `
+        <h3>Electronic Band Structure</h3>
+        <p>The electronic band structure determines the electrical and optical properties of the material.</p>
+        
+        <h4>Band Gap</h4>
+        <p>The band gap is the energy difference between the valence and conduction bands, determining if the material is metallic, semiconducting, or insulating.</p>
+        
+        <h4>Density of States</h4>
+        <p>The density of states shows the number of electronic states available at each energy level.</p>
+        
+        <h4>Fermi Level</h4>
+        <p>The Fermi level determines the filling of electronic states at zero temperature.</p>
+        
+        <h4>Effective Masses</h4>
+        <p>Effective masses of electrons and holes determine transport properties like mobility and conductivity.</p>
+        
+        <h4>Orbital Character</h4>
+        <p>Analysis of orbital contributions to different bands provides insight into bonding and chemical properties.</p>
+        
+        <h4>Spin-Orbit Coupling</h4>
+        <p>For materials with heavy elements, spin-orbit coupling can significantly modify the band structure.</p>
+        
+        <div style="height: 200px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
+          <p><strong>Band Structure Plot</strong></p>
+          <p>Interactive band structure diagram along high-symmetry k-points.</p>
+        </div>
+      `,
     },
     bader: {
+      id: "bader",
       title: "Bader Charges",
-      description: "abcd",
+      description: `
+        <h3>Bader Charge Analysis</h3>
+        <p>Bader charge analysis provides information about electron distribution and chemical bonding.</p>
+        
+        <h4>Charge Transfer</h4>
+        <p>Analysis of charge transfer between different atoms reveals the ionic character of bonds.</p>
+        
+        <h4>Electron Localization</h4>
+        <p>The degree of electron localization around each atom indicates the nature of chemical bonding.</p>
+        
+        <h4>Oxidation States</h4>
+        <p>Bader charges help determine the effective oxidation states of atoms in the material.</p>
+        
+        <h4>Electronegativity</h4>
+        <p>Differences in electronegativity drive charge transfer and influence material properties.</p>
+        
+        <h4>Bond Polarity</h4>
+        <p>The distribution of Bader charges reveals the polarity of chemical bonds.</p>
+        
+        <h4>Chemical Environment</h4>
+        <p>Local environment effects on atomic charges provide insight into coordination and bonding.</p>
+        
+        <div style="height: 160px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
+          <p><strong>Charge Distribution Map</strong></p>
+          <p>3D visualization of electron density and charge distribution.</p>
+        </div>
+      `,
     },
     optical: {
+      id: "optical",
       title: "Optical Polarizability",
-      description: "abc",
+      description: `
+        <h3>Optical Properties and Polarizability</h3>
+        <p>Optical properties determine how the material interacts with electromagnetic radiation.</p>
+        
+        <h4>Dielectric Function</h4>
+        <p>The frequency-dependent dielectric function describes the material's response to electric fields.</p>
+        
+        <h4>Refractive Index</h4>
+        <p>The refractive index determines how light propagates through the material.</p>
+        
+        <h4>Absorption Coefficient</h4>
+        <p>The absorption coefficient describes how strongly the material absorbs light at different frequencies.</p>
+        
+        <h4>Polarizability Tensor</h4>
+        <p>The polarizability tensor describes how the electron cloud responds to external electric fields.</p>
+        
+        <h4>Birefringence</h4>
+        <p>For anisotropic materials, birefringence describes the directional dependence of optical properties.</p>
+        
+        <h4>Nonlinear Optical Properties</h4>
+        <p>Second and third-order nonlinear susceptibilities are important for optical applications.</p>
+        
+        <div style="height: 180px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
+          <p><strong>Optical Spectrum</strong></p>
+          <p>Interactive plots showing absorption, reflection, and transmission spectra.</p>
+        </div>
+      `,
     },
   };
 
@@ -84,11 +220,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     const newContent = contentMap[selectedId];
     if (newContent) {
       contentArea.innerHTML = `
+      <section id='${newContent.id}'>
           <h2>${newContent.title}</h2>
           <p>${newContent.description}</p>
+      </section>
         `;
     }
-
+    // 移除舊的錨點導航邏輯，改為在外部統一處理
     // 移除所有 active 類別並標記當前選項
     statsItems.forEach((el) => el.classList.remove("active"));
     document
@@ -105,6 +243,17 @@ document.addEventListener("DOMContentLoaded", async function () {
       const selectedId = this.getAttribute("data-id");
       if (selectedId !== "visualization") {
         showContent(selectedId);
+        // 添加錨點導航功能
+        setTimeout(() => {
+          const targetSection = document.getElementById(selectedId);
+          if (targetSection) {
+            const offsetTop = targetSection.offsetTop - 80;
+            window.scrollTo({
+              top: offsetTop,
+              behavior: "smooth",
+            });
+          }
+        }, 100); // 短暫延遲確保內容已載入
       }
     });
   });
