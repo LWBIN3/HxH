@@ -71,6 +71,29 @@ app.get("/api/infovisualize", async (req, res) => {
   }
 });
 
+// 新增 SCF API endpoint
+app.get("/api/scf", async (req, res) => {
+  try {
+    if (!client) {
+      throw new Error("Database connection not established");
+    }
+
+    const database = client.db("material");
+    const scfCollection = database.collection("scf");
+
+    const result = await scfCollection.find({}).toArray();
+    // console.log(`Found ${result.length} documents in scf collection`);
+
+    res.json(result);
+  } catch (e) {
+    console.error("Error fetching SCF data:", e);
+    res.status(500).json({
+      error: "Error fetching SCF data",
+      details: e.message,
+    });
+  }
+});
+
 // 啟動伺服器
 async function startServer() {
   await connectToDatabase();
