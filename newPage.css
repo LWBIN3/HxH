@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+
+
+
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +16,8 @@ body {
     min-height: 100vh;
     background: #1A1C21;
     color: #fff;
-    font-family: 'Roboto mono', monospace;
+    /* font-family: 'Roboto mono', monospace; */
+    font-family: 'JetBrains Mono', monospace;
     padding-top: 45px;
     padding-left: 0;                 /* 移除左邊距，因為側邊欄是固定的 */
     overflow-x: hidden;

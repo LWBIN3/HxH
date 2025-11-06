@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const params = new URLSearchParams(window.location.search);
   const materialName = params.get("name");
   const materialDataRaw = params.get("data");
+  console.log(materialName, materialDataRaw);
   const materialData = materialDataRaw
     ? JSON.parse(decodeURIComponent(materialDataRaw))
     : null;
@@ -53,6 +54,26 @@ document.addEventListener("DOMContentLoaded", async function () {
   const statsItems = document.querySelectorAll(".stat-item");
   // 定義不同標籤對應的內容
   const contentMap = {
+    SCF: {
+      id: "SCF",
+      title: "Planar Charge Density difference",
+      description: `
+        
+        
+        <div style="width: 100%; display: flex; justify-content: center; align-items: center; padding: 0;">
+          <div id="scf-chart" style="width: 90%; max-width: 900px; height: 500px; margin: 20px 0;"></div>
+        </div>
+        
+        <div id="scf-loading" style="text-align: center; padding: 40px;">
+          <p>Loading cdd data...</p>
+        </div>
+        
+        <div id="scf-info" style="margin-top: 20px; padding: 15px; background-color: #4f65a8ff; border-radius: 8px; display: none;">
+          <h4>Analysis Details</h4>
+          <p id="scf-details"></p>
+        </div>
+      `,
+    },
     crystal: {
       id: "crystal",
       title: "Symmetries",
@@ -94,30 +115,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       title: "Stiffness Tensor",
       description: `
         <h3>Elastic Properties and Stiffness Tensor</h3>
-        <p>The elastic properties describe how the material responds to mechanical stress and strain.</p>
-        
-        <h4>Elastic Constants</h4>
-        <p>The elastic tensor contains all information about the material's mechanical response under small deformations.</p>
-        
-        <h4>Young's Modulus</h4>
-        <p>Young's modulus describes the material's stiffness in tension or compression along specific directions.</p>
-        
-        <h4>Bulk Modulus</h4>
-        <p>The bulk modulus indicates the material's resistance to uniform compression.</p>
-        
-        <h4>Shear Modulus</h4>
-        <p>The shear modulus describes the material's resistance to shear deformation.</p>
-        
-        <h4>Poisson's Ratio</h4>
-        <p>Poisson's ratio relates lateral strain to axial strain when the material is stretched or compressed.</p>
-        
-        <h4>Anisotropy</h4>
-        <p>Analysis of directional dependence of elastic properties is crucial for understanding material behavior.</p>
-        
-        <div style="height: 180px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
-          <p><strong>Elastic Tensor Visualization</strong></p>
-          <p>3D representation of elastic properties showing directional dependence.</p>
-        </div>
+
       `,
     },
     electronic: {
@@ -125,30 +123,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       title: "Electronic Bands",
       description: `
         <h3>Electronic Band Structure</h3>
-        <p>The electronic band structure determines the electrical and optical properties of the material.</p>
         
-        <h4>Band Gap</h4>
-        <p>The band gap is the energy difference between the valence and conduction bands, determining if the material is metallic, semiconducting, or insulating.</p>
-        
-        <h4>Density of States</h4>
-        <p>The density of states shows the number of electronic states available at each energy level.</p>
-        
-        <h4>Fermi Level</h4>
-        <p>The Fermi level determines the filling of electronic states at zero temperature.</p>
-        
-        <h4>Effective Masses</h4>
-        <p>Effective masses of electrons and holes determine transport properties like mobility and conductivity.</p>
-        
-        <h4>Orbital Character</h4>
-        <p>Analysis of orbital contributions to different bands provides insight into bonding and chemical properties.</p>
-        
-        <h4>Spin-Orbit Coupling</h4>
-        <p>For materials with heavy elements, spin-orbit coupling can significantly modify the band structure.</p>
-        
-        <div style="height: 200px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
-          <p><strong>Band Structure Plot</strong></p>
-          <p>Interactive band structure diagram along high-symmetry k-points.</p>
-        </div>
       `,
     },
     bader: {
@@ -156,30 +131,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       title: "Bader Charges",
       description: `
         <h3>Bader Charge Analysis</h3>
-        <p>Bader charge analysis provides information about electron distribution and chemical bonding.</p>
         
-        <h4>Charge Transfer</h4>
-        <p>Analysis of charge transfer between different atoms reveals the ionic character of bonds.</p>
-        
-        <h4>Electron Localization</h4>
-        <p>The degree of electron localization around each atom indicates the nature of chemical bonding.</p>
-        
-        <h4>Oxidation States</h4>
-        <p>Bader charges help determine the effective oxidation states of atoms in the material.</p>
-        
-        <h4>Electronegativity</h4>
-        <p>Differences in electronegativity drive charge transfer and influence material properties.</p>
-        
-        <h4>Bond Polarity</h4>
-        <p>The distribution of Bader charges reveals the polarity of chemical bonds.</p>
-        
-        <h4>Chemical Environment</h4>
-        <p>Local environment effects on atomic charges provide insight into coordination and bonding.</p>
-        
-        <div style="height: 160px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
-          <p><strong>Charge Distribution Map</strong></p>
-          <p>3D visualization of electron density and charge distribution.</p>
-        </div>
       `,
     },
     optical: {
@@ -187,30 +139,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       title: "Optical Polarizability",
       description: `
         <h3>Optical Properties and Polarizability</h3>
-        <p>Optical properties determine how the material interacts with electromagnetic radiation.</p>
-        
-        <h4>Dielectric Function</h4>
-        <p>The frequency-dependent dielectric function describes the material's response to electric fields.</p>
-        
-        <h4>Refractive Index</h4>
-        <p>The refractive index determines how light propagates through the material.</p>
-        
-        <h4>Absorption Coefficient</h4>
-        <p>The absorption coefficient describes how strongly the material absorbs light at different frequencies.</p>
-        
-        <h4>Polarizability Tensor</h4>
-        <p>The polarizability tensor describes how the electron cloud responds to external electric fields.</p>
-        
-        <h4>Birefringence</h4>
-        <p>For anisotropic materials, birefringence describes the directional dependence of optical properties.</p>
-        
-        <h4>Nonlinear Optical Properties</h4>
-        <p>Second and third-order nonlinear susceptibilities are important for optical applications.</p>
-        
-        <div style="height: 180px;  margin: 20px 0; padding: 20px; border-radius: 8px;">
-          <p><strong>Optical Spectrum</strong></p>
-          <p>Interactive plots showing absorption, reflection, and transmission spectra.</p>
-        </div>
+       
       `,
     },
   };
@@ -221,10 +150,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (newContent) {
       contentArea.innerHTML = `
       <section id='${newContent.id}'>
-          <h2>${newContent.title}</h2>
+          <h2><strong>${newContent.title}</strong></h2>
           <p>${newContent.description}</p>
       </section>
         `;
+
+      // 如果是 SCF 標籤，載入 SCF 圖表
+      if (selectedId === "SCF") {
+        loadSCFChart(materialName);
+      }
     }
     // 移除舊的錨點導航邏輯，改為在外部統一處理
     // 移除所有 active 類別並標記當前選項
@@ -1258,6 +1192,197 @@ function getElementSymbol(atomicNumber) {
     {}
   );
   return reverseElementMap[atomicNumber] || "Unknown";
+}
+
+// SCF 圖表載入函數
+async function loadSCFChart(materialName) {
+  const loadingDiv = document.getElementById("scf-loading");
+  const chartDiv = document.getElementById("scf-chart");
+  const infoDiv = document.getElementById("scf-info");
+  const detailsP = document.getElementById("scf-details");
+
+  try {
+    // 顯示載入狀態
+    loadingDiv.style.display = "block";
+    chartDiv.style.display = "none";
+    infoDiv.style.display = "none";
+
+    // 獲取 SCF 資料
+    const response = await fetch("/api/scf");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const scfData = await response.json();
+
+    // 尋找目前材料的 SCF 資料
+    console.log("Looking for material:", materialName);
+    console.log(
+      "Available SCF materials:",
+      scfData.map((item) => item.fileName)
+    );
+
+    let currentMaterialSCF = scfData.find(
+      (item) => item.fileName === materialName
+    );
+
+    if (!currentMaterialSCF) {
+      // 嘗試智能匹配：將名稱格式標準化後比較
+      function normalizeNames(name) {
+        return name
+          .toLowerCase()
+          .replace(/-/g, "_") // 替換 - 為 _
+          .replace(/[_\s]+/g, "_") // 多個下劃線或空格替換為單個下劃線
+          .replace(/^_|_$/g, ""); // 去除開頭和結尾的下劃線
+      }
+
+      const normalizedSearchName = normalizeNames(materialName);
+      console.log("Normalized search name:", normalizedSearchName);
+
+      // 嘗試多種匹配策略
+      let alternativeMatch = scfData.find((item) => {
+        const normalizedFileName = normalizeNames(item.fileName);
+        const normalizedMaterialName = normalizeNames(item.materialName);
+
+        // 策略1: 完全匹配標準化名稱
+        if (
+          normalizedFileName === normalizedSearchName ||
+          normalizedMaterialName === normalizedSearchName
+        ) {
+          return true;
+        }
+
+        // 策略2: 檢查是否包含主要成分 (如 Al2S3 和 Ag)
+        const searchParts = normalizedSearchName
+          .split("_")
+          .filter((p) => p.length > 0);
+        const fileParts = normalizedFileName
+          .split("_")
+          .filter((p) => p.length > 0);
+
+        // 檢查搜尋名稱的所有部分是否都能在文件名中找到
+        return (
+          searchParts.length > 1 &&
+          searchParts.every((part) =>
+            fileParts.some(
+              (filePart) => filePart.includes(part) || part.includes(filePart)
+            )
+          )
+        );
+      });
+
+      if (alternativeMatch) {
+        console.log("Found alternative match:", alternativeMatch.fileName);
+        currentMaterialSCF = alternativeMatch;
+      } else {
+        // 如果還是找不到，嘗試更寬鬆的匹配
+        const searchComponents = materialName
+          .split("-")
+          .filter((p) => p.trim().length > 1);
+        if (searchComponents.length >= 2) {
+          alternativeMatch = scfData.find((item) => {
+            const fileName = item.fileName.toLowerCase();
+            return searchComponents.every((component) =>
+              fileName.includes(component.toLowerCase())
+            );
+          });
+
+          if (alternativeMatch) {
+            console.log("Found loose match:", alternativeMatch.fileName);
+            currentMaterialSCF = alternativeMatch;
+          }
+        }
+      }
+
+      if (!currentMaterialSCF) {
+        loadingDiv.innerHTML = `
+          <p>No SCF data available for this material yet.</p>
+          <p><strong>Looking for:</strong> "${materialName}"</p>
+
+        `;
+        return;
+      }
+    }
+
+    // 準備繪圖資料
+    const distances = currentMaterialSCF.datData.map((point) => point.distance);
+    const potentials = currentMaterialSCF.datData.map(
+      (point) => point.potential
+    );
+
+    const trace = {
+      x: distances,
+      y: potentials,
+      type: "scatter",
+      mode: "lines+markers",
+      name: "Planar Average Potential",
+      line: {
+        color: "#cdc600ff",
+        width: 3,
+      },
+      marker: {
+        color: "#32921591",
+        size: 6,
+      },
+    };
+
+    const layout = {
+      title: {
+        text: `Planar Charge Density difference: ${materialName}`,
+        font: { size: 18 },
+      },
+      xaxis: {
+        title: "z-distance(Å)",
+        showgrid: true,
+        gridcolor: "#E0E0E0",
+      },
+      yaxis: {
+        title: "Charge density difference (e/Å)",
+        showgrid: true,
+        gridcolor: "#E0E0E0",
+      },
+      plot_bgcolor: "#FAFAFA",
+      paper_bgcolor: "#FFFFFF",
+      margin: { t: 60, r: 80, b: 80, l: 80 },
+      autosize: true,
+    };
+
+    const config = {
+      responsive: true,
+      displayModeBar: true,
+      modeBarButtonsToRemove: ["pan2d", "lasso2d", "select2d"],
+      displaylogo: false,
+      toImageButtonOptions: {
+        format: "png",
+        filename: `SCF_${materialName}`,
+        height: 500,
+        width: 800,
+        scale: 1,
+      },
+    };
+
+    // 繪製圖表
+    Plotly.newPlot(chartDiv, [trace], layout, config);
+
+    // 顯示詳細資訊
+    detailsP.innerHTML = `
+      <strong>File Name:</strong> ${currentMaterialSCF.materialName}<br>
+      <strong>Data Points:</strong> ${currentMaterialSCF.dataPoints}<br>
+      <strong>Distance Range:</strong> ${Math.min(...distances).toFixed(
+        4
+      )} - ${Math.max(...distances).toFixed(4)} Å<br>
+      <strong>Potential Range:</strong> ${Math.min(...potentials).toFixed(
+        6
+      )} - ${Math.max(...potentials).toFixed(6)} eV<br>
+    `;
+
+    // 隱藏載入狀態，顯示圖表和資訊
+    loadingDiv.style.display = "none";
+    chartDiv.style.display = "block";
+    infoDiv.style.display = "block";
+  } catch (error) {
+    console.error("Error loading SCF chart:", error);
+    loadingDiv.innerHTML = `<p style="color: red;">Error loading SCF data: ${error.message}</p>`;
+  }
 }
 
 function setupResizeObserver() {
