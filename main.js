@@ -1,4 +1,4 @@
-// Global variables
+// Global variables: filters
 let allMaterials = [];
 let filteredMaterials = [];
 let currentPage = 1;
@@ -92,6 +92,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // 點擊模態視窗外部關閉模態視窗
   modal.addEventListener("click", function (e) {
     if (e.target === modal) {
+      //modal代表背景區域，內容區塊會叫做modal-content
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
       closeModal();
     }
   });
@@ -139,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchMaterials();
   setupSearchHandlers();
   setupPaginationControls();
+  setupMaterialLinks();
 });
 
 // Setup search handlers
@@ -203,6 +211,37 @@ function setupPaginationControls() {
   document.getElementById("gotoPage").addEventListener("change", (e) => {
     currentPage = parseInt(e.target.value);
     displayMaterials(filteredMaterials);
+  });
+}
+
+// 設置材料連結的事件監聽器
+function setupMaterialLinks() {
+  // 使用 mousedown 事件來為所有點擊方式設置 sessionStorage（性能優化）
+  document.addEventListener("mousedown", function (event) {
+    if (event.target.classList.contains("material-link")) {
+      // 從材料名稱查找完整的材料數據並存到 sessionStorage
+      const materialName = event.target.getAttribute("data-material-name");
+      const material = allMaterials.find((m) => m.fullName === materialName);
+      if (material) {
+        sessionStorage.setItem("selectedMaterial", JSON.stringify(material));
+      }
+    }
+  });
+
+  // 使用 click 事件來處理左鍵點擊（同頁面開啟）
+  document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("material-link")) {
+      // 對於左鍵點擊且無修飾鍵，在同一頁面開啟
+      if (
+        event.button === 0 &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        window.location.href = event.target.href;
+      }
+    }
   });
 }
 
@@ -319,9 +358,12 @@ function displayMaterials(materials) {
   pageItems.forEach((material) => {
     const row = document.createElement("tr");
     const formula = material.fullName;
+    // create url
+    const params = new URLSearchParams({ name: formula });
+    const pageUrl = `newPage.html?${params.toString()}`;
 
     row.innerHTML = `
-            <td>${formula}</td>
+            <td><a href="${pageUrl}" class="material-link" data-material-name="${formula}">${formula}</a></td>
             <td>${
               material.bindingEnergy ? material.bindingEnergy.toFixed(3) : "-"
             }</td>
@@ -331,7 +373,6 @@ function displayMaterials(materials) {
             <td>${material.crystalPlane || "-"}</td>
         `;
 
-    row.onclick = () => loadPage(formula);
     materialList.appendChild(row);
   });
 
@@ -359,23 +400,6 @@ function updatePaginationControls(totalPages) {
 
   prevButton.classList.toggle("disabled", prevButton.disabled);
   nextButton.classList.toggle("disabled", nextButton.disabled);
-
-  const startRow = (currentPage - 1) * itemsPerPage + 1;
-  const endRow = Math.min(filteredMaterials.length, currentPage * itemsPerPage);
-  const totalItems = filteredMaterials.length;
-}
-
-// Load detail page for selected material
-function loadPage(materialName) {
-  const material = allMaterials.find((m) => m.fullName === materialName);
-
-  const params = new URLSearchParams({
-    name: materialName,
-    data: encodeURIComponent(JSON.stringify(material)),
-  });
-
-  window.open(`newPage.html?${params.toString()}`, "_self");
-  //改成'blank'就是新分頁，'self'就是原分頁開啟
 }
 
 // Convert numbers to subscript in chemical formulas

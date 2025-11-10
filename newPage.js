@@ -2,11 +2,62 @@ document.addEventListener("DOMContentLoaded", async function () {
   // 解析原本主要頁面傳來的資訊，包含材料名稱name以及材料的其他數據data
   const params = new URLSearchParams(window.location.search);
   const materialName = params.get("name");
-  const materialDataRaw = params.get("data");
-  console.log(materialName, materialDataRaw);
-  const materialData = materialDataRaw
-    ? JSON.parse(decodeURIComponent(materialDataRaw))
-    : null;
+
+  // 顯示載入狀態
+  const materialInfo = document.querySelector(".material-info");
+  materialInfo.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <h2>Loading material data...</h2>
+      <p>Material: ${materialName}</p>
+    </div>
+  `;
+  
+  let materialData = null;
+  
+  // 優先從 sessionStorage 讀取（性能優化）
+  const materialDataRaw = sessionStorage.getItem("selectedMaterial");
+  if (materialDataRaw) {
+    try {
+      const sessionData = JSON.parse(materialDataRaw);
+      // 驗證是否為當前材料的數據
+      if (sessionData.fullName === materialName) {
+        materialData = sessionData;
+        console.log("Material data loaded from sessionStorage:", materialData);
+      }
+    } catch (error) {
+      console.error("Failed to parse sessionStorage data:", error);
+    }
+  }
+
+  // 如果 sessionStorage 中沒有對應數據，從 API 獲取
+  if (materialName && !materialData) {
+    try {
+      console.log("Fetching material data from API...");
+      const response = await fetch("/api/material");
+      if (response.ok) {
+        const allMaterials = await response.json();
+        materialData = allMaterials.find((m) => m.fullName === materialName);
+        if (materialData) {
+          // 將獲取的數據存儲到 sessionStorage 以供下次使用
+          sessionStorage.setItem("selectedMaterial", JSON.stringify(materialData));
+          console.log("Material data fetched from API:", materialData);
+        }
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Failed to fetch material data from API:", error);
+      materialInfo.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+          <h2>Error Loading Material</h2>
+          <p>Failed to load data for: ${materialName}</p>
+          <p>Error: ${error.message}</p>
+        </div>
+      `;
+      return;
+    }
+  }
+
   console.log(materialName, materialData);
   // Overview的部份
   if (materialName && materialData) {
