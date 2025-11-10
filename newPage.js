@@ -24,15 +24,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       </table>
       <h2>Stability:</h2>
       <table class="info-table">
-        <tr><td>Energy above convex hull [eV/atom]</td><td>${
-          materialData.ehull?.toFixed(3) ?? "N/A"
+        <tr><td>Binding Energy [meV/Å²]</td><td>${
+          materialData.bindingEnergy?.toFixed(3) ?? "N/A"
         }</td></tr>
-        <tr><td>Heat of formation [eV]</td><td>${
-          materialData.hform?.toFixed(3) ?? "N/A"
-        }</td></tr>
-        <tr><td>Dynamically stable</td><td>${
-          materialData.dyn_stab || "N/A"
-        }</td></tr>
+
       </table>
       <h2>Basic properties:</h2>
       <table class="info-table">
@@ -321,8 +316,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   // 移除camera控制邏輯
   // 解析材料名稱並獲取原子序號
   const materialList = materialData.fullName;
-  // const atomicNumbers = materialList.map((element) => elementMap[element]);
-  // console.log(atomicNumbers);
 
   // 初始化時嘗試獲取並顯示結構，並自動啟動視覺化
   if (materialList.length > 0) {
@@ -408,10 +401,6 @@ scene.add(directionalLight1);
 const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight2.position.set(-1, -1, -1).normalize();
 scene.add(directionalLight2);
-
-// const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.8);
-// directionalLight3.position.set(-1, -1, 1).normalize();
-// scene.add(directionalLight3);
 
 // 添加點光源，增強特定區域照明
 const pointLight = new THREE.PointLight(0xffffff, 0.5);
@@ -623,13 +612,6 @@ function createStructureVisualization(atoms, cell, periodicSize = "1x1") {
     const skinColor = getAtomColor(atom.element);
     const sphereMaterial = new THREE.MeshPhongMaterial({
       color: skinColor,
-      // metalness: 0.1, // 金屬感低，維持非金屬特性
-      // roughness: 0.4, // 略光滑但不鏡面
-      // clearcoat: 0.8, // 有清漆層產生柔亮高光
-      // clearcoatRoughness: 0.1, // 清漆層光滑
-      // reflectivity: 0.5, // 半反射
-      // transmission: 0.0, // 如果不透明就設為 0
-      // thickness: 1.0, // 厚度，若 transmission > 0 才會有效
     });
 
     const modifiedRadius = getAtomRadius(atom.element) * 0.005;
@@ -738,13 +720,11 @@ function setCameraViewAlongAxis(axis, isReverse = false) {
   controls.update();
 }
 
-// 2. 建立 Raycaster + mouse
 const raycaster = new THREE.Raycaster();
 raycaster.params.Mesh.threshold = 0;
 raycaster.params.Line.threshold = 0.05; //縮小線段的使用範圍，避免一直被他擋住
 const mouse = new THREE.Vector2();
 
-// 3. 獲取 tooltip 容器
 const tooltipContainer = document.getElementById("tooltip-container");
 const tooltipContent = tooltipContainer.querySelector(".tooltip-content");
 
@@ -928,7 +908,7 @@ function createBonds(expandedAtoms, cell, bondInfo) {
 
   // 檢查 bonds 是否存在且為數組
   if (!bonds || !Array.isArray(bonds) || bonds.length === 0) {
-    console.warn("沒有鍵結可繪製或鍵結數據格式錯誤");
+    console.warn("bonding doesn't exist");
     return;
   }
 
@@ -975,7 +955,7 @@ function createBonds(expandedAtoms, cell, bondInfo) {
 
     // 如果表面點之間的距離太小，不繪製
     if (surfaceDistance < 0.001) {
-      console.log("原子表面太近，跳過繪製鍵結:", surfaceDistance);
+      console.log("atom surface too close:", surfaceDistance);
       return;
     }
 

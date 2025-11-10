@@ -107,7 +107,7 @@ nav .nav-content {
     flex-direction: column;
     gap: 0.6rem;
     align-items: stretch;
-    overflow: visible;               /* 改為完全 visible，讓下拉選單可以溢出 */
+    overflow: visible;               
     z-index: 1000;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
     border-right: 2px solid rgba(65, 105, 225, 0.2);
