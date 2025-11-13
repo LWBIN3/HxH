@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       <p>Material: ${materialName}</p>
     </div>
   `;
-  
+
   let materialData = null;
-  
+
   // 優先從 sessionStorage 讀取（性能優化）
   const materialDataRaw = sessionStorage.getItem("selectedMaterial");
   if (materialDataRaw) {
@@ -39,7 +39,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         materialData = allMaterials.find((m) => m.fullName === materialName);
         if (materialData) {
           // 將獲取的數據存儲到 sessionStorage 以供下次使用
-          sessionStorage.setItem("selectedMaterial", JSON.stringify(materialData));
+          sessionStorage.setItem(
+            "selectedMaterial",
+            JSON.stringify(materialData)
+          );
           console.log("Material data fetched from API:", materialData);
         }
       } else {
@@ -156,38 +159,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         
       `,
     },
-    stiffness: {
-      id: "stiffness",
-      title: "Stiffness Tensor",
-      description: `
-        <h3>Elastic Properties and Stiffness Tensor</h3>
-
-      `,
-    },
-    electronic: {
-      id: "electronic",
-      title: "Electronic Bands",
-      description: `
-        <h3>Electronic Band Structure</h3>
-        
-      `,
-    },
-    bader: {
-      id: "bader",
-      title: "Bader Charges",
-      description: `
-        <h3>Bader Charge Analysis</h3>
-        
-      `,
-    },
-    optical: {
-      id: "optical",
-      title: "Optical Polarizability",
-      description: `
-        <h3>Optical Properties and Polarizability</h3>
-       
-      `,
-    },
   };
 
   // 預設顯示 crystal 內容
@@ -200,13 +171,11 @@ document.addEventListener("DOMContentLoaded", async function () {
           <p>${newContent.description}</p>
       </section>
         `;
-
-      // 如果是 SCF 標籤，載入 SCF 圖表
       if (selectedId === "SCF") {
+        // 如果是 SCF 標籤，載入 SCF 圖表
         loadSCFChart(materialName);
       }
     }
-    // 移除舊的錨點導航邏輯，改為在外部統一處理
     // 移除所有 active 類別並標記當前選項
     statsItems.forEach((el) => el.classList.remove("active"));
     document
@@ -214,15 +183,35 @@ document.addEventListener("DOMContentLoaded", async function () {
       .classList.add("active");
   }
 
-  // 頁面載入時預設顯示 crystal 的內容
-  showContent("crystal");
+  const newContent = contentMap["crystal"];
+  if (newContent) {
+    contentArea.innerHTML = `
+    <section id='${newContent.id}'>
+        <h2><strong>${newContent.title}</strong></h2>
+        <p>${newContent.description}</p>
+    </section>
+      `;
+  }
+  // 保持 main 為 active 狀態
+  statsItems.forEach((el) => el.classList.remove("active"));
+  document.querySelector(`.stat-item[data-id="main"]`).classList.add("active");
 
   // 點擊事件處理
   statsItems.forEach((item) => {
     item.addEventListener("click", function () {
       const selectedId = this.getAttribute("data-id");
-      if (selectedId !== "visualization") {
+
+      if (selectedId === "main") {
+        // 點擊 main 時滾動到頁面頂部並設置為 active
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+        statsItems.forEach((el) => el.classList.remove("active"));
+        this.classList.add("active");
+      } else if (selectedId !== "visualization") {
         showContent(selectedId);
+
         // 添加錨點導航功能
         setTimeout(() => {
           const targetSection = document.getElementById(selectedId);
@@ -233,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async function () {
               behavior: "smooth",
             });
           }
-        }, 100); // 短暫延遲確保內容已載入
+        }, 500); // 短暫延遲確保內容已載入
       }
     });
   });
