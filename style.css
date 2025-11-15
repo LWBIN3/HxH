@@ -79,6 +79,40 @@ nav .nav-content {
     transform: scale(1.05);
 }
 
+#switch-theme{
+    height : 30px;
+    width:30px;
+    padding: 1.3rem;
+    background-color:transparent;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid #000000; */
+    cursor:pointer;
+
+}
+
+
+#switch-theme img:first-child{
+    display: none;
+}
+
+.lightmode #switch-theme img:last-child{
+    display: none;
+}
+
+.lightmode #switch-theme img:first-child{
+    display: block;
+}
+
+#switch-theme img:hover{
+
+    border-radius: 6px;
+    transform: scale(1.05);
+    outline: 0.8rem solid rgba(255, 255, 255, 0.5);  /* 新增邊框 */
+}
+
 
 .home {
     position: relative;
@@ -86,13 +120,39 @@ nav .nav-content {
     left: 0;
     height: 80vh;
     width: 100%;
-    background: #1A1C21;
+    background: var(--bg-color);
     display: flex;
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
     z-index: 1;
     padding-top: 10%; /* 和nav保持距離 */
+}
+
+/* 定義CSS變數來管理主題顏色 */
+:root {
+    --bg-color: #1A1C21;
+    --pg-ctrl: #2F333A;
+    --table-color:#2F333A;
+    --text-color: #ffffff;
+    --search-bar: #2F333A;
+    --material-count:rgba(47, 51, 58, 0.8);
+    --search-placeholder :rgba(255, 255, 255, 0.5);
+    --search-icon :#2F333A;
+    --search-border:1px solid #444d5c;
+
+}
+
+.lightmode{
+    --bg-color: #fafafa;
+    --pg-ctrl: #ffffff;
+    --text-color: #1a1a1a;
+    --table-color: #ffffff;
+    --search-bar: #eeeeee;
+    --material-count:rgba(255, 255, 255, 0.85);
+    --search-placeholder :rgba(100, 100, 100, 0.6);
+    --search-icon :#ffffff;
+    --search-border:1px solid #e5e7eb;
 }
 
 .logo-img {
@@ -116,7 +176,7 @@ nav .nav-content {
     max-width: 900px;
     display: flex;
     gap: 10px;
-    background: #2F333A;/* 深灰色背景 */
+    background:var(--search-bar) ;
     padding: 10px 20px;
     border-radius: 28px;
 }
@@ -127,12 +187,12 @@ nav .nav-content {
     font-size: 16px;
     background: transparent; /* 透明背景 */
     border: none;
-    color: #ffffff;
+    color: var(--text-color);
     outline: none;
 }
 
 .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.5);/* 淡灰色的提示文字 */
+    color: var(--search-placeholder)
 }
 
 .search-separator {
@@ -148,9 +208,9 @@ nav .nav-content {
     align-items: center;
     justify-content: center;
     padding: 18px 30px;
-    background: #2F333A;/* 與搜尋框同色 */
+    background:var(--search-icon) ;
     color: #4070f4;
-    border: 1px solid #444d5c; /* 統一的邊框顏色 */
+    border:var(--search-border) ;
     border-radius: 1000px;
     font-size: 25px;
     cursor: pointer;
@@ -175,8 +235,8 @@ nav .nav-content {
 #materialCount {
     font-family: "Roboto Mono", monospace;
     font-size: 16px;
-    color: #e0e0e0;
-    background: rgba(47, 51, 58, 0.8);
+    color: var(--text-color);
+    background: var(--material-count);
     padding: 8px 16px;
     border-radius: 6px;
     border: 1px solid rgba(65, 105, 225, 0.3);
@@ -186,11 +246,11 @@ nav .nav-content {
 .filteredMaterials {
     padding: 40px 80px;
     text-align: justify; 
-    color: #ffffff;
+    color: var(--text-color);
 
     z-index: 1;
     min-height: auto;
-
+    background-color: var(--bg-color);
     position: relative;
     height: auto;
     overflow-y: visible;
@@ -202,7 +262,7 @@ nav .nav-content {
     border-collapse: separate;
     border-spacing: 0;
     margin: 20px 0;
-    background: #2F333A;
+    background:var(--table-color) ;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -222,7 +282,7 @@ nav .nav-content {
     text-align: left;
     font-weight: 500;
     font-size: 14px;
-    color: #ffffff;
+    color: var(--text-color);
     letter-spacing: 0.5px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
@@ -232,7 +292,7 @@ nav .nav-content {
     padding: 12px 20px;
     font-size: 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    color: #e0e0e0;
+    color: var(--text-color);
 }
 
 .filteredMaterials tbody tr:hover {
@@ -255,7 +315,7 @@ nav .nav-content {
     gap: 15px;
     margin-top: 20px;
     padding: 15px;
-    background: #2F333A;
+    background: var(--pg-ctrl) ;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
@@ -269,8 +329,8 @@ nav .nav-content {
     padding: 8px 12px;
     border: 1px solid rgba(65, 105, 225, 0.3);
     border-radius: 6px;
-    background: #1A1C21;
-    color: #ffffff;
+    background:var(--bg-color);
+    color:var(--text-color);
     font-size: 14px;
     cursor: pointer;
     outline: none;
@@ -304,8 +364,8 @@ nav .nav-content {
 }
 
 .pagectrl button:disabled {
-    background: #2F333A;
-    color: rgba(255, 255, 255, 0.3);
+    background: var(--bg-color);
+    color: var(--text-color);
     cursor: not-allowed;
     transform: none;
 }
