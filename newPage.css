@@ -14,8 +14,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #1A1C21;
-    color: #fff;
+    background: var(--bg-color);
+    color: var(--text-color);
     /* font-family: 'Roboto mono', monospace; */
     font-family: 'JetBrains Mono', monospace;
     padding-top: 45px;
@@ -36,7 +36,7 @@ nav {
     left: 0;
     top: 0;
     width: 100%;
-    background: linear-gradient(145deg, #4169e1, #5177e5);
+    background: linear-gradient(145deg, var(--nav-gradient-start), var(--nav-gradient-end));
     padding: 10px;
     box-shadow: 0 2px 10px rgba(65, 105, 225, 0.2);
     font-family: "Roboto Mono", monospace;
@@ -94,28 +94,159 @@ nav .nav-content {
     transform: scale(1.05);
 }
 
+/* 定義CSS變數來管理主題顏色 */
+:root {
+    --bg-color: #1A1C21;
+    --pg-ctrl: #2F333A;
+    --table-color: #2F333A;
+    --text-color: #ffffff;
+    --search-bar: #2F333A;
+    --material-count: rgba(47, 51, 58, 0.8);
+    --search-placeholder: rgba(255, 255, 255, 0.5);
+    --search-icon: #2F333A;
+    --search-border: 1px solid #444d5c;
+    --stats-bar-bg: #23252c;
+    --stats-bar-hover: rgba(255, 255, 255, 0.08);
+    --stats-bar-active: #4169e1;
+    --visualization-area-bg: #2a2d35;
+    --tooltip-bg: rgba(255, 255, 255, 0.05);
+    --tooltip-border: rgba(255, 255, 255, 0.1);
+    --dropdown-bg: #2a2d35;
+    --table-header-bg: #2c5e77;
+    --table-body-bg: #e4f0f5;
+    --border-color: rgb(140 140 140);
+    --nav-gradient-start: #4169e1;
+    --nav-gradient-end: #5177e5;
+    --box-shadow: rgba(0, 0, 0, 0.3);
+    --canvas-bg: #2a2d35;
+    --info-table-border: rgba(255, 255, 255, 0.15);
+    --info-table-header-bg: #3a4a5c;
+    --info-table-cell-bg: #2a2d35;
+    --info-table-header-text: #ffffff;
+    --info-table-cell-text: #e2e8f0;
+    --info-table-shadow: rgba(0, 0, 0, 0.3);
+}
+
+.lightmode {
+    --bg-color: #fafafa;
+    --pg-ctrl: #ffffff;
+    --text-color: #1a1a1a;
+    --table-color: #ffffff;
+    --search-bar: #eeeeee;
+    --material-count: rgba(255, 255, 255, 0.85);
+    --search-placeholder: rgba(100, 100, 100, 0.6);
+    --search-icon: #ffffff;
+    --search-border: 1px solid #e5e7eb;
+    --stats-bar-bg: #f8f9fa;
+    --stats-bar-hover: rgba(0, 0, 0, 0.05);
+    --stats-bar-active: #4169e1;
+    --visualization-area-bg: #f8f9fa;
+    --tooltip-bg: rgba(0, 0, 0, 0.05);
+    --tooltip-border: rgba(0, 0, 0, 0.1);
+    --dropdown-bg: #ffffff;
+    --table-header-bg: #e3f2fd;
+    --table-body-bg: #ffffff;
+    --border-color: rgb(200, 200, 200);
+    --nav-gradient-start: #4169e1;
+    --nav-gradient-end: #5177e5;
+    --box-shadow: rgba(0, 0, 0, 0.1);
+    --canvas-bg: #e8eaed;
+    --info-table-border: rgba(0, 0, 0, 0.1);
+    --info-table-header-bg: rgba(65, 105, 225, 0.1);
+    --info-table-cell-bg: rgba(248, 249, 250, 0.8);
+    --info-table-header-text: #4169e1;
+    --info-table-cell-text: #2d3748;
+    --info-table-shadow: rgba(0, 0, 0, 0.05);
+}
+
+#switch-theme {
+    height: 40px;
+    width: 40px;
+    padding: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+
+#switch-theme img:first-child {
+    display: none;
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+}
+
+.lightmode #switch-theme img:last-child {
+    display: none;
+}
+
+.lightmode #switch-theme img:first-child {
+    display: block;
+}
+
+#switch-theme img {
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+    filter: brightness(1.2);
+}
+
+#switch-theme:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(65, 105, 225, 0.3);
+}
+
+#switch-theme:hover img {
+    transform: rotate(180deg);
+    filter: brightness(1.5);
+}
+
+/* 淺色模式下的按鈕樣式 */
+.lightmode #switch-theme {
+    border-color: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.lightmode #switch-theme:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+
 /* 側邊欄樣式 - 可收合設計 */
 .stats-bar {
     position: fixed;
     left: 0;
-    top: 60px;                       /* 在導航欄下方，增加一點間距 */
-    width: 60px;                     /* 收合時的寬度 */
-    height: calc(100vh - 70px);      /* 調整高度避免切到導航欄 */
+    top: 60px;
+    width: 60px;
+    height: calc(100vh - 70px);
     padding: 1.5rem 0.5rem;
-    background: #23252c;
+    background: var(--stats-bar-bg);
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
     align-items: stretch;
-    overflow: visible;               
+    overflow: visible;
     z-index: 1000;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 0 10px var(--box-shadow);
     border-right: 2px solid rgba(65, 105, 225, 0.2);
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
 }
 
 .stats-bar:hover {
-    width: 220px;                    /* 展開時的寬度 */
+    width: 260px;                    /* 增加展開寬度以容納長文字 */
     padding: 1.5rem 1rem;
 }
 
@@ -126,24 +257,27 @@ nav .nav-content {
 
 .stat-item {
     min-height: 2.5rem;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--stats-bar-hover);
     padding: 0.6rem;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
-    justify-content: center;          /* 收合時置中 */
+    justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
     width: 100%;
     border: 1px solid transparent;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stats-bar:hover .stat-item {
     justify-content: flex-start;      /* 展開時左對齊 */
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 0.8rem;
+    white-space: normal;              /* 允許文字換行 */
+    line-height: 1.3;
 }
 
 .stat-item:hover {
@@ -153,7 +287,7 @@ nav .nav-content {
 }
 
 .stat-item.active {
-    background: #4169e1;
+    background: var(--stats-bar-active);
     color: white;
     box-shadow: 0 2px 8px rgba(65, 105, 225, 0.4);
 }
@@ -177,38 +311,86 @@ nav .nav-content {
 
 /* 當側邊欄展開時，content-area 自動調整 */
 .stats-bar:hover ~ .content-area {
-    width: calc(100% - 220px);
-    margin-left: 220px;
-    max-width: calc(100rem - 220px);
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    max-width: calc(100rem - 260px);
 }
 
 /* 響應式布局改進 */
 .material-info {
-    flex: 0 1 36%;                  /* 固定尺寸 */
-    width: 450px;                    /* 增加寬度 */
+    flex: 0 1 36%;
+    width: 450px;
     min-width: 400px;
-    padding: 1rem;                   /* 恢復內邊距 */
-    font-size: 0.8rem;               /* 保持較小字體 */
+    max-height: 28rem;               /* 限制最大高度與畫布相近 */
 
-    border-radius: 8px;
-    margin: -0.5rem 0rem 0rem 0rem;
-    height: auto;                    /* 自動高度 */
-    min-height: auto;              
-    overflow: visible;               /* 不要滾動條 */
+    padding: 1.2rem;
+    font-size: 0.82rem;
+    background: var(--pg-ctrl);
+    border: 1px solid var(--info-table-border);
+    border-radius: 12px;
+    margin: 1.2rem 0rem 0rem 0rem;
+    overflow-y: auto;                /* 需要時顯示滾動條 */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin-left:auto;
+    margin-left: auto;
+    box-shadow: 0 4px 20px var(--info-table-shadow);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.material-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    /* background: linear-gradient(90deg, #4169e1, #5177e5, #4169e1); */
+    border-radius: 12px 12px 0 0;
+}
+
+/* 自定義滾動條樣式 */
+.material-info::-webkit-scrollbar {
+    width: 6px;
+}
+
+.material-info::-webkit-scrollbar-track {
+    background: var(--info-table-border);
+    border-radius: 3px;
+}
+
+.material-info::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #4169e1, #5177e5);
+    border-radius: 3px;
+}
+
+.material-info::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #5177e5, #4169e1);
 }
 
 /* 介紹區內的標題縮小 */
 .material-info h1 {
-    font-size: 1.4rem;               /* 主標題 */
-    margin-bottom: 0.6rem;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+    color: var(--text-color);
+    font-weight: 700;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--info-table-border);
+    background: linear-gradient(135deg, #4169e1, #5177e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .material-info h2 {
-    font-size: 1.05rem;              /* 副標題 */
+    font-size: 1rem;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
+    color: var(--info-table-header-text);
+    font-weight: 600;
+    padding: 0.4rem 0.5rem;
+    border-left: 3px solid #4169e1;
+    background: linear-gradient(90deg, var(--info-table-header-bg), transparent);
+    border-radius: 4px;
 }
 
 /* 視覺化容器包裝器 */
@@ -227,37 +409,45 @@ nav .nav-content {
 }
 
 .visualization-area {
-    background: #2a2d35;
+    background: var(--visualization-area-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    height: 20rem;                   /* 主要視覺化區域 (20rem) */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    height: 20rem;
+    box-shadow: 0 4px 15px var(--box-shadow);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px 12px 0 0;
 }
 
 /* tooltip容器樣式 */
 .tooltip-container {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 0 0 12px 12px;    /* 只有下方圓角 */
+    background: var(--tooltip-bg);
+    border-radius: 0 0 12px 12px;
     padding: 1rem;
-    height: 8rem;                    /* tooltip資訊區域 (8rem) */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    height: 8rem;
+    border-top: 1px solid var(--tooltip-border);
+    box-shadow: 0 4px 15px var(--box-shadow);
 }
 
 .tooltip-container h3 {
     margin: 0 0 0.5rem 0;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #4169e1;
-    font-weight: 500;
+    font-weight: 600;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .tooltip-content {
-    color: #e0e0e0;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-weight: 500;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .tooltip-content p {
@@ -283,7 +473,7 @@ nav .nav-content {
     }
     
     .stats-bar:hover {
-        width: 180px;
+        width: 200px;
     }
     
     .content-area {
@@ -295,8 +485,8 @@ nav .nav-content {
     }
     
     .stats-bar:hover ~ .content-area {
-        width: calc(100% - 180px);
-        margin-left: 180px;
+        width: calc(100% - 200px);
+        margin-left: 200px;
     }
 
     .material-info,
@@ -312,8 +502,8 @@ nav .nav-content {
     }
     
     .stats-bar:hover ~ .maincontent {
-        width: calc(100% - 180px);
-        margin-left: 180px;
+        width: calc(100% - 200px);
+        margin-left: 200px;
     }
 }
 
@@ -369,22 +559,63 @@ nav .nav-content {
 }
 
 .info-table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     width: 100%;
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.82rem;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px var(--info-table-shadow);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--info-table-border);
 }
 
 .info-table td {
-    border: 1px solid #ccc;
-    padding: 0.3rem 0.6rem;
-    background-color: #5559c7;
+    border: none;
+    border-bottom: 1px solid var(--info-table-border);
+    padding: 0.6rem 0.8rem;
+    background-color: var(--info-table-cell-bg);
+    color: var(--info-table-cell-text);
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+
+.info-table tr:hover td {
+    background-color: rgba(65, 105, 225, 0.2);
+    transform: translateX(2px);
+}
+
+.info-table tr:hover td:first-child {
+    background-color: rgba(65, 105, 225, 0.3);
+    color: #ffffff;
+}
+
+.info-table tr:hover td:not(:first-child) {
+    color: #ffffff;
 }
 
 .info-table td:first-child {
-    font-weight: bold;
+    font-weight: 600;
     width: 50%;
-    background-color: #485766;
+    background-color: var(--info-table-header-bg);
+    color: var(--info-table-header-text);
+    border-right: 1px solid var(--info-table-border);
+    position: relative;
+}
+
+.info-table td:first-child::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #4169e1, #5177e5);
 }
 
 /* 修正 material-details 的布局 */
@@ -397,8 +628,8 @@ nav .nav-content {
 }
 
 .stats-bar:hover ~ .maincontent {
-    width: calc(100% - 220px);
-    margin-left: 220px;
+    width: calc(100% - 260px);
+    margin-left: 260px;
 }
 
 .material-details {
@@ -429,14 +660,14 @@ nav .nav-content {
 .dropdown-button {
     width: 100%;
     padding: 0.6rem;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--stats-bar-hover);
     border: 1px solid transparent;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
-    justify-content: center;          /* 收合時置中 */
+    justify-content: center;
     align-items: center;
-    color: white;
+    color: var(--text-color);
     font-family: 'Roboto mono',monospace;
     font-size: 0.95rem;
     min-height: 2.5rem;
@@ -465,13 +696,14 @@ nav .nav-content {
 
 .dropdown-content {
     display: none;
-    position: fixed;                 /* 改為 fixed 定位，完全脫離容器限制 */
-    background: #2a2d35;
+    position: fixed;
+    background: var(--dropdown-bg);
     border-radius: 4px;
     margin-top: 4px;
-    z-index: 3000;                   /* 大幅提高層級 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    min-width: 180px;                /* 設定最小寬度 */
+    z-index: 3000;
+    box-shadow: 0 4px 12px var(--box-shadow);
+    min-width: 180px;
+    border: 1px solid var(--tooltip-border);
 }
 
 .dropdown-content.show {
@@ -481,7 +713,7 @@ nav .nav-content {
 .dropdown-item {
     padding: 12px 16px;
     cursor: pointer;
-    color: white;
+    color: var(--text-color);
     font-size: 0.9rem;
     transition: background-color 0.2s;
 }
@@ -492,12 +724,13 @@ nav .nav-content {
 
 .submenu {
     display: none;
-    position: fixed;                 /* 改為 fixed 定位 */
-    background: #2a2d35;
+    position: fixed;
+    background: var(--dropdown-bg);
     border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    z-index: 3001;                   /* 子選單層級更高 */
+    box-shadow: 0 4px 8px var(--box-shadow);
+    z-index: 3001;
     min-width: 80px;
+    border: 1px solid var(--tooltip-border);
 }
 
 .has-submenu:hover .submenu {
@@ -538,17 +771,17 @@ nav .nav-content {
 
 thead,
 tfoot {
-    background-color: #2c5e77;
-    color: #fff;
+    background-color: var(--table-header-bg);
+    color: var(--text-color);
 }
 
 tbody {
-    background-color: #e4f0f5;
+    background-color: var(--table-body-bg);
 }
 
 table {
     border-collapse: collapse;
-    border: 2px solid rgb(140 140 140);
+    border: 2px solid var(--border-color);
     font-family: sans-serif;
     font-size: 0.8rem;
     letter-spacing: 1px;
@@ -561,7 +794,7 @@ caption {
 
 th,
 td {
-    border: 1px solid rgb(160 160 160);
+    border: 1px solid var(--border-color);
     padding: 8px 10px;
 }
 

@@ -410,7 +410,16 @@ renderer.toneMappingExposure = 1.0;
 
 // 設置渲染器大小為容器大小而非窗口大小
 renderer.setSize(containerWidth, containerHeight);
-renderer.setClearColor(0x2a2d35);
+
+// 初始設定背景顏色
+function updateCanvasTheme() {
+  const isLightMode = document.body.classList.contains("lightmode");
+  const backgroundColor = isLightMode ? 0xe8eaed : 0x2a2d35;
+  renderer.setClearColor(backgroundColor);
+}
+
+// 設定初始背景
+updateCanvasTheme();
 
 // 將渲染器的 DOM 元素添加到指定的容器
 threeContainer.appendChild(renderer.domElement);
@@ -1432,3 +1441,25 @@ function onWindowResize() {
   renderer.setPixelRatio(window.devicePixelRatio);
 }
 setupResizeObserver();
+
+let lightmode = localStorage.getItem("lightmode");
+const toggleDayNight = document.getElementById("switch-theme");
+
+const enableLightMode = () => {
+  document.body.classList.add("lightmode");
+  localStorage.setItem("lightmode", "active");
+  updateCanvasTheme(); // 更新畫布主題
+};
+
+const disableLightMode = () => {
+  document.body.classList.remove("lightmode");
+  localStorage.setItem("lightmode", null);
+  updateCanvasTheme(); // 更新畫布主題
+};
+
+if (lightmode === "active") enableLightMode();
+
+toggleDayNight.addEventListener("click", () => {
+  lightmode = localStorage.getItem("lightmode");
+  lightmode !== "active" ? enableLightMode() : disableLightMode();
+});

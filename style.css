@@ -79,38 +79,68 @@ nav .nav-content {
     transform: scale(1.05);
 }
 
-#switch-theme{
-    height : 30px;
-    width:30px;
-    padding: 1.3rem;
-    background-color:transparent;
+#switch-theme {
+    height: 40px;
+    width: 40px;
+    padding: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* border: 1px solid #000000; */
-    cursor:pointer;
-
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 
-#switch-theme img:first-child{
+#switch-theme img:first-child {
+    display: none;
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+}
+
+.lightmode #switch-theme img:last-child {
     display: none;
 }
 
-.lightmode #switch-theme img:last-child{
-    display: none;
-}
-
-.lightmode #switch-theme img:first-child{
+.lightmode #switch-theme img:first-child {
     display: block;
 }
 
-#switch-theme img:hover{
+#switch-theme img {
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+    filter: brightness(1.2);
+}
 
-    border-radius: 6px;
-    transform: scale(1.05);
-    outline: 0.8rem solid rgba(255, 255, 255, 0.5);  /* 新增邊框 */
+#switch-theme:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(65, 105, 225, 0.3);
+}
+
+#switch-theme:hover img {
+    transform: rotate(180deg);
+    filter: brightness(1.5);
+}
+
+/* 淺色模式下的按鈕樣式 */
+.lightmode #switch-theme {
+    border-color: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.lightmode #switch-theme:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 
